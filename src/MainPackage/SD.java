@@ -6,7 +6,7 @@ package MainPackage;
 
 /**
  *
- * @author pilli
+ * @author Angelo
  */
 public class SD {
     

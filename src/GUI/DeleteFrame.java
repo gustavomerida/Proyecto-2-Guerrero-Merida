@@ -6,7 +6,7 @@ package GUI;
 
 /**
  *
- * @author pilli
+ * @author Angelo
  */
 public class DeleteFrame extends javax.swing.JFrame {
 

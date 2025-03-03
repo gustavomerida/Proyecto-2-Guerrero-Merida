@@ -4,10 +4,21 @@
  */
 package MainPackage;
 
+import AuxClass.List;
+
 /**
  *
- * @author pilli
+ * @author Angelo
  */
 public class Directory {
+    private String DirectoryName;
+    private List<File> FilesIntoDirectory;
+    private List<Directory> SubDirectoriesList;
+
+    public Directory(String DirectoryName, List<File> FilesIntoDirectory, List<Directory> SubDirectoriesList) {
+        this.DirectoryName = DirectoryName;
+        this.FilesIntoDirectory = FilesIntoDirectory;
+        this.SubDirectoriesList = SubDirectoriesList;
+    }
     
 }
