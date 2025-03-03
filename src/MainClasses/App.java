@@ -6,7 +6,7 @@ package MainClasses;
 
 /**
  *
- * @author pilli
+ * @author Angelo
  */
 public class App {
     
