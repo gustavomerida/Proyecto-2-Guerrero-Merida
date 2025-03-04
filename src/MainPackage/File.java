@@ -13,17 +13,17 @@ import AuxClass.List;
 public class File {
     private String FileName;
     private int BlockSize; 
-    private String FileType;
+    // private String FileType;
     private Block FirstBlock;
     private List<Block> BlocksList;
     private Directory ParentDirectory;
 
-    public File(String FileName, int BlockSize, String FileType, Block FirstBlock, List<Block> BlocksList, Directory ParentDirectory) {
+    public File(String FileName, int BlockSize, Block FirstBlock, List<Block> BlocksList, Directory ParentDirectory) {
         this.FileName = FileName;
         this.BlockSize = BlockSize;
-        this.FileType = FileType; // .txt o .pdf...
-        this.FirstBlock = FirstBlock; // Apuntador al primer bloque
-        this.BlocksList = BlocksList; // Lista de los bloques a colorear
+        // this.FileType = FileType; // .txt o .pdf...
+        this.FirstBlock = null; // Apuntador al primer bloque
+        this.BlocksList = null; // Lista de los bloques a colorear
         this.ParentDirectory = ParentDirectory; // Directorio Padre
     }
 
@@ -42,7 +42,7 @@ public class File {
     public void setBlockSize(int BlockSize) {
         this.BlockSize = BlockSize;
     }
-
+/*
     public String getFileType() {
         return FileType;
     }
@@ -50,7 +50,7 @@ public class File {
     public void setFileType(String FileType) {
         this.FileType = FileType;
     }
-
+*/
     public Block getFirstBlock() {
         return FirstBlock;
     }

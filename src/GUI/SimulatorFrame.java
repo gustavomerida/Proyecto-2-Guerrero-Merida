@@ -15,10 +15,6 @@ public class SimulatorFrame extends javax.swing.JFrame {
      */
     public SimulatorFrame() {
         
-        
-        
-        
-        
         initComponents();
         this.setBounds(0, 0, 986, 618);
         this.setResizable(false);

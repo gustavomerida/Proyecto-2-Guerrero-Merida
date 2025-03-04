@@ -4,6 +4,8 @@
  */
 package GUI;
 
+import MainPackage.Directory;
+import MainPackage.File;
 import javax.swing.JLabel;
 
 /**
@@ -74,6 +76,8 @@ public class CreateFrame extends javax.swing.JFrame {
         jLabel3.setText("Nombre del Archivo");
         jPanel1.add(jLabel3);
         jLabel3.setBounds(150, 140, 120, 16);
+
+        SliderValueLabel.setText("1");
         jPanel1.add(SliderValueLabel);
         SliderValueLabel.setBounds(530, 190, 70, 20);
 
@@ -118,17 +122,17 @@ public class CreateFrame extends javax.swing.JFrame {
             }
         });
         jPanel1.add(Create);
-        Create.setBounds(300, 320, 72, 23);
+        Create.setBounds(340, 310, 72, 23);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 862, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE)
         );
 
         pack();
@@ -173,11 +177,23 @@ public class CreateFrame extends javax.swing.JFrame {
             ComboBoxDirectories.setBounds(310, 190, 72, 22);
         }
         
-        
     }//GEN-LAST:event_ComboBoxCreateSelectionActionPerformed
-
+    
     private void CreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateActionPerformed
-        // TODO add your handling code here:
+        /*
+        CREACION DEL ARCHIVO
+        */
+        String ElementToCreate = ComboBoxCreateSelection.getModel().getSelectedItem().toString();
+        if (ElementToCreate.equalsIgnoreCase("Archivo")) {
+            // Creamos el File
+            String FileName = jTextField1.getText();
+            int BlockSize = jSlider1.getModel().getValue();
+            
+            String DirectoryName = ComboBoxDirectories.getModel().getSelectedItem().toString();
+            Directory ParentDirectory = new Directory(DirectoryName, FilesIntoDirectory, SubDirectoriesList)
+            
+            File NewFile = new File(FileName, BlockSize, FirstBlock, BlocksList, ParentDirectory)
+        } 
     }//GEN-LAST:event_CreateActionPerformed
 
     /**

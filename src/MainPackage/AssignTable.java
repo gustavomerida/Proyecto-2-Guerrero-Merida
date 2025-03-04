@@ -4,10 +4,28 @@
  */
 package MainPackage;
 
+import AuxClass.List;
+
 /**
  *
  * @author Angelo
  */
 public class AssignTable {
+    private List<File> ListFiles;
+
+    public AssignTable(List<File> ListFiles) {
+        this.ListFiles = ListFiles;
+    }
+
+    public List<File> getListFiles() {
+        return ListFiles;
+    }
+
+    public void setListFiles(List<File> ListFiles) {
+        this.ListFiles = ListFiles;
+    }
+    
+    
+    
     
 }
