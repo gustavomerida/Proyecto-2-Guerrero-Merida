@@ -9,5 +9,40 @@ package MainPackage;
  * @author Angelo
  */
 public class Block {
+    private int id;
+    private boolean State;
+    private File FileInBlock;
     
+
+    public Block(int id, File FileInBlock) {
+        this.id = id;
+        this.State = false;
+        this.FileInBlock = FileInBlock;
+        
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public boolean isState() {
+        return State;
+    }
+
+    public void setState(boolean State) {
+        this.State = State;
+    }
+
+    public File getFileInBlock() {
+        return FileInBlock;
+    }
+
+    public void setFileInBlock(File FileInBlock) {
+        this.FileInBlock = FileInBlock;
+    }
+
 }
