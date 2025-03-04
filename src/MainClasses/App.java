@@ -6,6 +6,7 @@ package MainClasses;
 
 import AuxClass.List;
 import AuxClass.Node;
+import GUI.SimulatorFrame;
 import MainPackage.AssignTable;
 import MainPackage.Block;
 import MainPackage.File;
@@ -39,7 +40,7 @@ public class App {
 
         int Limit = 30;
         List<Block> BlocksList = new List("BlocksList");
-        
+
         for (int i = 0; i < Limit; i++) {
             Block NewBlock = new Block(i, null);
             BlocksList.append(NewBlock);
@@ -74,20 +75,22 @@ public class App {
 //            System.out.println(block.isState());
 //            current = current.getpNext();
 //        }
-        
         Node<Block> CurrentNode = this.SDApp.getBlocksList().first();
-        while (CurrentNode != null) {            
+        while (CurrentNode != null) {
             Block block = CurrentNode.gettInfo();
             System.out.println(block.isState());
             CurrentNode = CurrentNode.getpNext();
         }
-        
-        
+
+        this.FileSystemApp.getAssignTableSystem().updateTextArea();
+
     }
 
     public void start() {
         System.out.println("Runneando");
-        testSearchAndSet();
+        SimulatorFrame SimulatorFrameWindow = new SimulatorFrame();
+        SimulatorFrameWindow.setVisible(true);
+//        testSearchAndSet();
     }
 
     public SD getSDApp() {

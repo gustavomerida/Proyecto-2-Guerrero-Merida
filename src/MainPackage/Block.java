@@ -9,16 +9,20 @@ package MainPackage;
  * @author Angelo
  */
 public class Block {
+
     private int id;
     private boolean State;
     private File FileInBlock;
-    
 
     public Block(int id, File FileInBlock) {
         this.id = id;
         this.State = false;
         this.FileInBlock = FileInBlock;
-        
+
+    }
+
+    public String ShowID() {
+        return "ID: " + this.getId(); // O el detalle que quieras mostrar
     }
 
     public int getId() {

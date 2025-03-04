@@ -4,9 +4,13 @@
  */
 package GUI;
 
+import MainClasses.App;
 import MainPackage.Directory;
 import MainPackage.File;
 import javax.swing.JLabel;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
  *
@@ -17,15 +21,22 @@ public class CreateFrame extends javax.swing.JFrame {
     /**
      * Creates new form CreateFrame
      */
-    public CreateFrame() {
+    private DefaultMutableTreeNode SelectedNode;
+    private JTree FilesTree;
+    private final App app = App.getInstance();
+
+    public CreateFrame(JTree FilesTree, DefaultMutableTreeNode SelectedNode) {
+        
         initComponents();
         
-        this.setBounds(0, 0,690, 432);
+        this.FilesTree = FilesTree;
+        this.SelectedNode = SelectedNode;
+        this.setBounds(0, 0, 690, 432);
         this.setResizable(false);
-        
+
     }
-    
-    private void updateSliderLabel(){
+
+    private void updateSliderLabel() {
         String SliderValue = String.valueOf(this.jSlider1.getValue());
         this.SliderValueLabel.setText(SliderValue);
     }
@@ -41,8 +52,6 @@ public class CreateFrame extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        ComboBoxDirectories = new javax.swing.JComboBox<>();
-        jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         SliderValueLabel = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
@@ -50,6 +59,7 @@ public class CreateFrame extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         ComboBoxCreateSelection = new javax.swing.JComboBox<>();
         Create = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -59,19 +69,6 @@ public class CreateFrame extends javax.swing.JFrame {
         jLabel1.setText("¿Qué desea crear?");
         jPanel1.add(jLabel1);
         jLabel1.setBounds(130, 80, 130, 40);
-
-        ComboBoxDirectories.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "root" }));
-        ComboBoxDirectories.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ComboBoxDirectoriesActionPerformed(evt);
-            }
-        });
-        jPanel1.add(ComboBoxDirectories);
-        ComboBoxDirectories.setBounds(310, 240, 72, 22);
-
-        jLabel2.setText("Directorio Padre");
-        jPanel1.add(jLabel2);
-        jLabel2.setBounds(160, 240, 100, 16);
 
         jLabel3.setText("Nombre del Archivo");
         jPanel1.add(jLabel3);
@@ -124,6 +121,15 @@ public class CreateFrame extends javax.swing.JFrame {
         jPanel1.add(Create);
         Create.setBounds(340, 310, 72, 23);
 
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton1);
+        jButton1.setBounds(470, 310, 75, 23);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -146,55 +152,64 @@ public class CreateFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField1ActionPerformed
 
-    private void ComboBoxDirectoriesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxDirectoriesActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_ComboBoxDirectoriesActionPerformed
-
     private void ComboBoxCreateSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxCreateSelectionActionPerformed
         // Atributos dinamicos
-        JLabel[] JLabelArray = {jLabel3, jLabel5, jLabel2};
-                
+        JLabel[] JLabelArray = {jLabel3, jLabel5};
+
         // Logica para la creacion de un archivo o directorio
         String selectedItem = this.ComboBoxCreateSelection.getModel().getSelectedItem().toString();
-        
+
         if (selectedItem.equalsIgnoreCase("Archivo")) {
             JLabelArray[0].setText("Nombre del Archivo");
-            
-            JLabelArray[2].setBounds(150, 240, 90, 16);
-            ComboBoxDirectories.setBounds(310, 240, 72, 22);
-            
-            
+
             JLabelArray[1].setVisible(true);
             this.jSlider1.setVisible(true);
-            
-            
-        }
-        else{
+
+        } else {
             JLabelArray[0].setText("Nombre del Directorio");
             JLabelArray[1].setVisible(false);
             this.jSlider1.setVisible(false);
-            JLabelArray[2].setBounds(150, 190, 90, 16);
-            ComboBoxDirectories.setBounds(310, 190, 72, 22);
         }
-        
+
     }//GEN-LAST:event_ComboBoxCreateSelectionActionPerformed
-    
+
     private void CreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateActionPerformed
         /*
         CREACION DEL ARCHIVO
-        */
+         */
+
         String ElementToCreate = ComboBoxCreateSelection.getModel().getSelectedItem().toString();
         if (ElementToCreate.equalsIgnoreCase("Archivo")) {
             // Creamos el File
             String FileName = jTextField1.getText();
             int BlockSize = jSlider1.getModel().getValue();
+
+            File NewFile = new File(FileName, BlockSize, null, null, null);
+
+            boolean AccessToSD = app.getFileSystemApp().searchAndSet(NewFile.getBlockSize(), NewFile);
+
+            if (AccessToSD) {
+                System.out.println("El valor ha sido colocado en la SD");
+                
+                // Colocando el nuevo nodo en la estructura jtree
+                DefaultMutableTreeNode NewNode = new DefaultMutableTreeNode(NewFile.getFileName());
+                
+                if (this.SelectedNode != null) {
+                    DefaultTreeModel Model = (DefaultTreeModel) this.FilesTree.getModel();
+                    Model.insertNodeInto(NewNode, this.SelectedNode, this.SelectedNode.getChildCount());
+                }
+            }
+        } else {
             
-            String DirectoryName = ComboBoxDirectories.getModel().getSelectedItem().toString();
-            Directory ParentDirectory = new Directory(DirectoryName, FilesIntoDirectory, SubDirectoriesList)
-            
-            File NewFile = new File(FileName, BlockSize, FirstBlock, BlocksList, ParentDirectory)
-        } 
+            String DirectoryName = jTextField1.getText();
+            Directory NewDirectory = new Directory(DirectoryName, null, null);
+        }
+
     }//GEN-LAST:event_CreateActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        this.setVisible(false);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -226,18 +241,17 @@ public class CreateFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new CreateFrame().setVisible(true);
+                new CreateFrame(null, null).setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> ComboBoxCreateSelection;
-    private javax.swing.JComboBox<String> ComboBoxDirectories;
     private javax.swing.JButton Create;
     private javax.swing.JLabel SliderValueLabel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;

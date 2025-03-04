@@ -4,6 +4,16 @@
  */
 package GUI;
 
+import MainClasses.App;
+import MainPackage.Directory;
+import MainPackage.File;
+import java.util.Enumeration;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+
 /**
  *
  * @author Angelo
@@ -13,12 +23,22 @@ public class SimulatorFrame extends javax.swing.JFrame {
     /**
      * Creates new form SimulatorFrame
      */
+    // Creacion del modelo Jtree
+    private DefaultTreeModel Model;
+    protected DefaultMutableTreeNode SelectedNode;
+    private final App app = App.getInstance();
+
     public SimulatorFrame() {
-        
+
         initComponents();
+        SimulatorInit();
+
+        Model = new DefaultTreeModel(new DefaultMutableTreeNode("root"));
+        this.FilesTree.setModel(Model);
+
         this.setBounds(0, 0, 986, 618);
         this.setResizable(false);
-        
+
     }
 
     /**
@@ -32,6 +52,8 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        FilesTree = new javax.swing.JTree();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -40,27 +62,48 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        ComboBoxCreateSelection = new javax.swing.JComboBox<>();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jSlider1 = new javax.swing.JSlider();
+        Guardar = new javax.swing.JButton();
+        SliderValueLabel = new javax.swing.JLabel();
+        jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jPanel1.setLayout(null);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        FilesTree.setBorder(null);
+        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
+        FilesTree.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+        FilesTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                FilesTreeValueChanged(evt);
+            }
+        });
+        jScrollPane2.setViewportView(FilesTree);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 358, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 478, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 60, 360, 480));
+        jPanel1.add(jPanel2);
+        jPanel2.setBounds(600, 30, 360, 250);
 
         jPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
@@ -68,60 +111,126 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 528, Short.MAX_VALUE)
+            .addGap(0, 458, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 228, Short.MAX_VALUE)
         );
 
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 310, 530, 230));
+        jPanel1.add(jPanel3);
+        jPanel3.setBounds(500, 340, 460, 230);
 
         jPanel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel4.setLayout(new java.awt.BorderLayout());
 
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 428, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
-        );
+        jPanel4.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
-        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 430, 220));
+        jPanel1.add(jPanel4);
+        jPanel4.setBounds(40, 30, 400, 190);
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("ASSIGN TABLE");
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 30, 90, -1));
+        jPanel1.add(jLabel2);
+        jLabel2.setBounds(210, 10, 90, 16);
 
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("JTREE");
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 30, 90, -1));
+        jPanel1.add(jLabel3);
+        jLabel3.setBounds(730, 10, 90, 16);
 
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText("SD");
-        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 290, 90, -1));
+        jPanel1.add(jLabel4);
+        jLabel4.setBounds(710, 310, 50, 16);
 
         jButton1.setText("Actualizar");
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 190, -1, -1));
+        jPanel1.add(jButton1);
+        jButton1.setBounds(20, 340, 82, 23);
 
-        jButton2.setText("Crear");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+        jButton3.setText("Crear");
+        jButton3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton3MouseClicked(evt);
             }
         });
-        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 130, -1, -1));
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton3);
+        jButton3.setBounds(20, 280, 72, 23);
 
-        jButton3.setText("Eliminar");
-        jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 160, -1, -1));
+        jLabel5.setText("Nombre del Archivo");
+        jPanel1.add(jLabel5);
+        jLabel5.setBounds(130, 330, 120, 16);
+
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jTextField1);
+        jTextField1.setBounds(290, 330, 170, 22);
+
+        ComboBoxCreateSelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Archivo", "Directorio" }));
+        ComboBoxCreateSelection.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ComboBoxCreateSelectionActionPerformed(evt);
+            }
+        });
+        jPanel1.add(ComboBoxCreateSelection);
+        ComboBoxCreateSelection.setBounds(290, 280, 86, 22);
+
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("¿Qué desea crear?");
+        jPanel1.add(jLabel1);
+        jLabel1.setBounds(110, 270, 130, 40);
+
+        jLabel6.setText("Tamaño en Bloques");
+        jPanel1.add(jLabel6);
+        jLabel6.setBounds(130, 380, 120, 16);
+
+        jSlider1.setMaximum(20);
+        jSlider1.setMinimum(1);
+        jSlider1.setPaintLabels(true);
+        jSlider1.setPaintTicks(true);
+        jSlider1.setValue(1);
+        jSlider1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSlider1StateChanged(evt);
+            }
+        });
+        jPanel1.add(jSlider1);
+        jSlider1.setBounds(280, 380, 200, 28);
+
+        Guardar.setText("Guardar");
+        Guardar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                GuardarMouseClicked(evt);
+            }
+        });
+        Guardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                GuardarActionPerformed(evt);
+            }
+        });
+        jPanel1.add(Guardar);
+        Guardar.setBounds(250, 430, 72, 23);
+
+        SliderValueLabel.setText("1");
+        jPanel1.add(SliderValueLabel);
+        SliderValueLabel.setBounds(480, 380, 20, 20);
+
+        jButton4.setText("Eliminar");
+        jPanel1.add(jButton4);
+        jButton4.setBounds(20, 310, 73, 23);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -137,10 +246,142 @@ public class SimulatorFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        CreateFrame CreateFrameWindow = new CreateFrame();
-        CreateFrameWindow.setVisible(true);
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void SimulatorInit() {
+        JLabel[] CreateLabels = {jLabel1, jLabel5, jLabel6};
+        for (int i = 0; i < CreateLabels.length; i++) {
+            CreateLabels[i].setVisible(false);
+        }
+
+        ComboBoxCreateSelection.setVisible(false);
+        jTextField1.setVisible(false);
+        jSlider1.setVisible(false);
+        Guardar.setVisible(false);
+    }
+
+    private void UpdateTextArea() {
+        String TextAreaContent = app.getFileSystemApp().getAssignTableSystem().updateTextArea().toString();
+        this.jTextArea1.setText(TextAreaContent);
+    }
+
+
+    private void FilesTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_FilesTreeValueChanged
+        SelectedNode = (DefaultMutableTreeNode) this.FilesTree.getLastSelectedPathComponent();
+    }//GEN-LAST:event_FilesTreeValueChanged
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void ComboBoxCreateSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxCreateSelectionActionPerformed
+        // Atributos dinamicos
+        JLabel[] JLabelArray = {jLabel3, jLabel5};
+
+        // Logica para la creacion de un archivo o directorio
+        String selectedItem = this.ComboBoxCreateSelection.getModel().getSelectedItem().toString();
+
+        if (selectedItem.equalsIgnoreCase("Archivo")) {
+            JLabelArray[0].setText("Nombre del Archivo");
+
+            JLabelArray[1].setVisible(true);
+            this.jSlider1.setVisible(true);
+
+        } else {
+            JLabelArray[0].setText("Nombre del Directorio");
+            JLabelArray[1].setVisible(false);
+            this.jSlider1.setVisible(false);
+        }
+    }//GEN-LAST:event_ComboBoxCreateSelectionActionPerformed
+
+    private void updateSliderLabel() {
+        String SliderValue = String.valueOf(this.jSlider1.getValue());
+        this.SliderValueLabel.setText(SliderValue);
+    }
+
+    private void jSlider1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider1StateChanged
+        updateSliderLabel();
+    }//GEN-LAST:event_jSlider1StateChanged
+
+    private boolean VerifyFile(String FileName) {
+        if (this.SelectedNode != null) {
+            Enumeration<TreeNode> children = this.SelectedNode.children();
+            while (children.hasMoreElements()) {
+                DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
+                if (child.getUserObject().toString().equalsIgnoreCase(FileName)) {
+                    return true; // El archivo ya existe en la carpeta
+                }
+            }
+        }
+        return false;
+    }
+
+    private void GuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GuardarActionPerformed
+        //
+    }//GEN-LAST:event_GuardarActionPerformed
+
+    private void jButton3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton3MouseClicked
+
+        JLabel[] CreateLabels = {jLabel1, jLabel5, jLabel6};
+        for (int i = 0; i < CreateLabels.length; i++) {
+            CreateLabels[i].setVisible(true);
+        }
+        ComboBoxCreateSelection.setVisible(true);
+        jTextField1.setVisible(true);
+        jSlider1.setVisible(true);
+        Guardar.setVisible(true);
+
+    }//GEN-LAST:event_jButton3MouseClicked
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void GuardarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarMouseClicked
+        /*
+    CREACION DEL ARCHIVO
+         */
+
+        if (this.SelectedNode != null) {
+            String ElementToCreate = ComboBoxCreateSelection.getModel().getSelectedItem().toString();
+            if (ElementToCreate.equalsIgnoreCase("Archivo")) {
+                // Creamos el File
+                String FileName = jTextField1.getText();
+                int BlockSize = jSlider1.getModel().getValue();
+
+                // Verificar si ya existe un archivo con el mismo nombre en la misma carpeta
+                if (VerifyFile(FileName)) {
+                    JOptionPane.showMessageDialog(null, "Ya existe un archivo con el mismo nombre en esta carpeta.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                File NewFile = new File(FileName, BlockSize, null, null, null);
+
+                boolean AccessToSD = app.getFileSystemApp().searchAndSet(NewFile.getBlockSize(), NewFile);
+
+                if (AccessToSD) {
+                    System.out.println("El valor ha sido colocado en la SD");
+
+                    // Colocando el nuevo nodo en la estructura jtree
+                    DefaultMutableTreeNode NewNode = new DefaultMutableTreeNode(NewFile.getFileName());
+
+                    if (this.SelectedNode != null) {
+                        DefaultTreeModel Model = (DefaultTreeModel) this.FilesTree.getModel();
+                        Model.insertNodeInto(NewNode, this.SelectedNode, this.SelectedNode.getChildCount());
+                        app.getFileSystemApp().getAssignTableSystem().getListFiles().append(NewFile);
+                        
+                        UpdateTextArea();
+
+                    }
+                }
+            } else {
+                // NO SE COMO VAMOS A MANEJAR ESTO
+                String DirectoryName = jTextField1.getText();
+                Directory NewDirectory = new Directory(DirectoryName, null, null);
+            }
+
+        }
+
+
+    }//GEN-LAST:event_GuardarMouseClicked
 
     /**
      * @param args the command line arguments
@@ -178,17 +419,27 @@ public class SimulatorFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> ComboBoxCreateSelection;
+    private javax.swing.JTree FilesTree;
+    private javax.swing.JButton Guardar;
+    private javax.swing.JLabel SliderValueLabel;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSlider jSlider1;
     private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }

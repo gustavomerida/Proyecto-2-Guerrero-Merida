@@ -4,23 +4,24 @@
  */
 package AuxClass;
 
+import MainPackage.Block;
 
 /**
  *
  * @author Angelo
  */
-public class List <T>{
-    private Node <T> pFirst;
+public class List<T> {
+
+    private Node<T> pFirst;
     private String name;
     private int iN;
-    
-    
-    public List (String s){
-        this.name=s;
-        this.pFirst=null;
-        this.iN=0;
+
+    public List(String s) {
+        this.name = s;
+        this.pFirst = null;
+        this.iN = 0;
     }
-    
+
     public Node<T> getSpecificNode(Object elem) {
         Node<T> actual = this.pFirst;
         while (actual != null) {
@@ -31,35 +32,35 @@ public class List <T>{
         }
         return null;
     }
-    
-    public int size (){
+
+    public int size() {
         return this.iN;
     }
-    
-    public boolean isEmpty(){
-        return this.pFirst==last();
+
+    public boolean isEmpty() {
+        return this.pFirst == last();
     }
-    
-    public Node last(){
+
+    public Node last() {
         return null;
     }
-    
-    public Node first(){
+
+    public Node first() {
         return this.pFirst;
     }
-    
-    public T read(Node <T> pValor){
+
+    public T read(Node<T> pValor) {
         return pValor.gettInfo();
     }
-    
-    public Node <T> next (Node <T> pValor){
-        if (pValor != this.last()){
+
+    public Node<T> next(Node<T> pValor) {
+        if (pValor != this.last()) {
             return pValor.getpNext();
-        }else{
+        } else {
             return null;
         }
     }
-    
+
     public T get(int index) {
         if (index < 0 || index >= iN) {
             throw new IndexOutOfBoundsException("index overflow");
@@ -71,56 +72,81 @@ public class List <T>{
         }
         return current.gettInfo();
     }
-    
-    public void insert(T x, Node <T> pValor){
-     // postinsertar.   
-        Node <T> pNew= new Node <>(x);
-        if (this.isEmpty()){
-            this.pFirst=pNew;
-        }else{
+
+    public void insert(T x, Node<T> pValor) {
+        // postinsertar.   
+        Node<T> pNew = new Node<>(x);
+        if (this.isEmpty()) {
+            this.pFirst = pNew;
+        } else {
             pNew.setpNext(pValor.getpNext());
             pValor.setpNext(pNew);
         }
         iN++;
     }
-    public String travel (){
-        Node <T> pAux; 
-        String result="";
-        if(this.isEmpty()){
-            result="Está vacía";
-        }else{
-            pAux=this.first();
-            while (pAux != this.last()){
-                result=result+this.read(pAux)+ ", ";
-                pAux=this.next(pAux);
+
+    public String travel() {
+        Node<T> pAux;
+        String result = "";
+        if (this.isEmpty()) {
+            result = "Está vacía";
+        } else {
+            pAux = this.first();
+            while (pAux != this.last()) {
+                result = result + this.read(pAux) + ", ";
+                pAux = this.next(pAux);
             }
-            
+
         }
         return result;
     }
-    
+
+    public String travel2() {
+        Node<T> pAux = this.first();
+        StringBuilder result = new StringBuilder();
+
+        if (this.isEmpty()) {
+            return "Está vacía";
+        }
+
+        while (pAux != this.last()) {
+            T info = pAux.gettInfo(); // Obtener el valor del nodo
+
+            // Verificar si el tipo es Block y llamar a ShowID, de lo contrario usar toString()
+            if (info instanceof Block) {
+                result.append(((Block) info).ShowID());
+            } else {
+                result.append(info.toString()); // Usar toString() para otros tipos
+            }
+            result.append(", "); // Separar elementos con una coma
+
+            pAux = this.next(pAux); // Pasar al siguiente nodo
+        }
+
+        return result.toString();
+    }
+
     public void append(T data) {
         Node<T> newNode = new Node<>(data);
         if (pFirst == null) {
             pFirst = newNode;
         } else {
             Node<T> temp = pFirst;
-            while (temp.getpNext()!= null) {
+            while (temp.getpNext() != null) {
                 temp = temp.getpNext();
             }
             temp.setpNext(newNode);
         }
         iN++;
     }
-    
-    
-    public Node <T> beforeLast(){
-        if (this.isEmpty()){
+
+    public Node<T> beforeLast() {
+        if (this.isEmpty()) {
             return null;
-        }else{
-            Node <T> pAux=this.first();
-            while (pAux.getpNext()!= this.last()){
-                pAux=this.next(pAux);
+        } else {
+            Node<T> pAux = this.first();
+            while (pAux.getpNext() != this.last()) {
+                pAux = this.next(pAux);
             }
             return pAux;
         }
