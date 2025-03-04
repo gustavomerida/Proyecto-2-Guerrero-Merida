@@ -23,7 +23,7 @@ public class FileSystem {
         this.SDSystem = SDSystem;
     }
 
-    public void searchAndSet(int BlockSizeFile, File newFile) {
+    public boolean searchAndSet(int BlockSizeFile, File newFile) {
         
         List<Block> BlocksListFile = new List("Blocks File");
         newFile.setBlocksList(BlocksListFile);
@@ -41,7 +41,7 @@ public class FileSystem {
 
         if (BlockSizeFile > BlocksAvailable) {
             System.out.println("No hay suficientes bloques disponibles.");
-            return;
+            return false;
         }
 
         CurrentBlock = this.SDSystem.getBlocksList().first();
@@ -57,6 +57,8 @@ public class FileSystem {
             CurrentBlock = CurrentBlock.getpNext();
         }
         newFile.setFirstBlock((Block) BlocksListFile.first().gettInfo());
+        
+        return true;
     }
 
     public AssignTable getAssignTableSystem() {
