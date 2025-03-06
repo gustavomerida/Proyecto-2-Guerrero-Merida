@@ -21,7 +21,7 @@ public class AssignTable {
     public StringBuilder updateTextArea() {
 
         StringBuilder sb = new StringBuilder();
-
+        
         sb.append(String.format("%-20s %-15s %-20s %-50s\n", "Nombre Archivo", "Bloques Asignados", "Direccion Primer Bloque", "Color"));
         sb.append("----------------------------------------------------------------------------\n");
 
