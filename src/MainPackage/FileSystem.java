@@ -60,6 +60,10 @@ public class FileSystem {
         
         return true;
     }
+    
+    public void DeleteFile(){
+        //
+    }
 
     public AssignTable getAssignTableSystem() {
         return AssignTableSystem;
