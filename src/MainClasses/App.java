@@ -33,7 +33,7 @@ public class App {
         if (instance == null) {
             instance = new App();
         }
-        return instance;
+        return instance; 
     }
 
     private SD SDInit() {
