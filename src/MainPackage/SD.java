@@ -13,8 +13,6 @@ import MainClasses.App;
  * @author Angelo
  */
 public class SD {
-    
-    
 
     private int LimitBlocks;
     private List<Block> BlocksList;

@@ -4,13 +4,34 @@
  */
 package GUI;
 
+import GUI.ColorRenderer;
+
+import AuxClass.List;
+import AuxClass.Node;
 import MainClasses.App;
+import MainPackage.Block;
 import MainPackage.Directory;
 import MainPackage.File;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.util.Enumeration;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.ListModel;
+import javax.swing.UIManager;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
@@ -28,6 +49,9 @@ public class SimulatorFrame extends javax.swing.JFrame {
     protected DefaultMutableTreeNode SelectedNode;
     private final App app = App.getInstance();
 
+    private List<DefaultListModel> listModels = new List<>("LISTA MODELOS");
+    private List<JList> jLists = new List<>("LISTA JLISTS");
+
     public SimulatorFrame() {
 
         initComponents();
@@ -38,6 +62,9 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
         this.setBounds(0, 0, 986, 618);
         this.setResizable(false);
+
+        configurarTreeRenderer();
+        PanelBlocksInit();
 
     }
 
@@ -56,8 +83,8 @@ public class SimulatorFrame extends javax.swing.JFrame {
         FilesTree = new javax.swing.JTree();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -84,6 +111,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
         FilesTree.setBorder(null);
         javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
         FilesTree.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+        FilesTree.setMaximumSize(new java.awt.Dimension(30, 30));
         FilesTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 FilesTreeValueChanged(evt);
@@ -95,17 +123,15 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE)
         );
 
         jPanel1.add(jPanel2);
-        jPanel2.setBounds(600, 30, 360, 250);
+        jPanel2.setBounds(500, 30, 460, 270);
 
         jPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
@@ -126,15 +152,21 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jPanel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanel4.setLayout(new java.awt.BorderLayout());
 
-        jTextArea1.setEditable(false);
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
 
-        jPanel4.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+            },
+            new String [] {
+                "Nombre", "Bloque Inicial", "Longitud", "Bloques Asignados"
+            }
+        ));
+        jTable1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jScrollPane3.setViewportView(jTable1);
+
+        jPanel4.add(jScrollPane3, java.awt.BorderLayout.CENTER);
 
         jPanel1.add(jPanel4);
-        jPanel4.setBounds(40, 30, 400, 190);
+        jPanel4.setBounds(10, 30, 470, 190);
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("ASSIGN TABLE");
@@ -144,7 +176,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("JTREE");
         jPanel1.add(jLabel3);
-        jLabel3.setBounds(730, 10, 90, 16);
+        jLabel3.setBounds(700, 10, 90, 16);
 
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText("SD");
@@ -193,7 +225,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
         jPanel1.add(ComboBoxCreateSelection);
-        ComboBoxCreateSelection.setBounds(290, 280, 88, 22);
+        ComboBoxCreateSelection.setBounds(290, 280, 86, 22);
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("¿Qué desea crear?");
@@ -246,7 +278,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
         jPanel1.add(ComboBoxUserMode);
-        ComboBoxUserMode.setBounds(30, 490, 145, 22);
+        ComboBoxUserMode.setBounds(30, 490, 146, 22);
 
         jLabel9.setText("Modos de usuario:");
         jPanel1.add(jLabel9);
@@ -266,6 +298,56 @@ public class SimulatorFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void PanelBlocksInit() {
+        jPanel3.setLayout(new GridLayout(5, 5, 5, 5));
+
+        // NECESARIO PARA LAS ACTUALIZACIONES DE LAS MISMAS
+        this.listModels = new List<>("NUEVA LISTA MODELOS");
+        this.jLists = new List<>("NUEVA LISTA JLISTS");
+
+        for (int i = 0; i < app.getSDApp().getLimitBlocks(); i++) {
+            DefaultListModel<String> model = new DefaultListModel<>();
+
+            // VALORES POR DEFECTO DE LAS JLISTS
+            model.addElement("Bloque " + (i + 1));
+            model.addElement("Libre");
+
+            JList<String> jList = new JList<>(model);
+
+//            jList.setEnabled(false);
+            jList.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+            jList.setCellRenderer(new DefaultListCellRenderer()); // Renderizador inicial
+
+            this.jPanel3.add(new JScrollPane(jList));
+            this.listModels.append(model);
+
+            this.jLists.append(jList);
+        }
+        jPanel3.revalidate();
+    }
+
+    
+    // SE DEBE VER CUANDO EXPLOTE
+    private void PanelBlocksUpdate() {
+        Node<Block> currentBlock = app.getSDApp().getBlocksList().first();
+        int index = 0;
+
+        while (currentBlock != null && index < listModels.size()) {
+            DefaultListModel<String> model = listModels.get(index);
+
+            // this.jLists.get(index).setCellRenderer(new ColorRenderer()); // EN ETAPA DE PRUEBAS.
+            
+            // SE MODIFICA LA SEGUNDA STRING DEL MODEL
+            if (currentBlock.gettInfo().isState()) {
+                model.set(1, "Ocupado");
+            } else {
+                model.set(1, "Libre");
+            }
+            currentBlock = currentBlock.getpNext();
+            index++;
+        }
+    }
+
     private void SimulatorInit() {
         JLabel[] CreateLabels = {jLabel1, jLabel5, jLabel6};
         for (int i = 0; i < CreateLabels.length; i++) {
@@ -282,11 +364,34 @@ public class SimulatorFrame extends javax.swing.JFrame {
         UpdateButton.setVisible(false);
     }
 
-    private void UpdateTextArea() {
-        String TextAreaContent = app.getFileSystemApp().getAssignTableSystem().updateTextArea().toString();
-        this.jTextArea1.setText(TextAreaContent);
-    }
+    private void configurarTreeRenderer() {
+        ImageIcon fileIcon = new ImageIcon(getClass().getResource("../Images/file2.png"));
+        ImageIcon directoryIcon = new ImageIcon(getClass().getResource("../Images/directory.png"));
 
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer() {
+            @Override
+            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
+                    boolean expanded, boolean leaf, int row,
+                    boolean hasFocus) {
+                super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+
+                if (value instanceof DefaultMutableTreeNode) {
+                    DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+                    String label = node.getUserObject().toString();
+
+                    if (label.contains(" [A]")) {
+                        setIcon(fileIcon);
+
+                    } else if (label.contains(" [D]") || label.contains("root")) {
+                        setIcon(directoryIcon);
+                    }
+                }
+                return this;
+            }
+        };
+
+        FilesTree.setCellRenderer(renderer);
+    }
 
     private void FilesTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_FilesTreeValueChanged
         SelectedNode = (DefaultMutableTreeNode) this.FilesTree.getLastSelectedPathComponent();
@@ -331,15 +436,65 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
     private boolean VerifyFile(String FileName) {
         if (this.SelectedNode != null) {
+            
             Enumeration<TreeNode> children = this.SelectedNode.children();
             while (children.hasMoreElements()) {
                 DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
-                if (child.getUserObject().toString().equalsIgnoreCase(FileName)) {
-                    return true; // El archivo ya existe en la carpeta
+                
+                String nodeName = child.getUserObject().toString();
+                
+                if (nodeName.contains(" [")) {
+                    nodeName = nodeName.substring(0, nodeName.indexOf(" [")).trim();
+                }
+                if (nodeName.equalsIgnoreCase(FileName)) {
+                    return true; 
                 }
             }
         }
         return false;
+    }
+
+    private boolean VerifyDirectory(String directoryName) {
+        if (this.SelectedNode != null) {
+            
+            Enumeration<TreeNode> children = this.SelectedNode.children();
+            while (children.hasMoreElements()) {
+                
+                DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
+                String label = child.getUserObject().toString();
+                
+                if (label.contains(" [D]")) {
+                    
+                    String nodeName = label.substring(0, label.indexOf(" [D]")).trim();
+                    if (nodeName.equalsIgnoreCase(directoryName)) {
+                        return true; 
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    private void updateAssignmentTable() {
+
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+
+        model.setRowCount(0);
+
+        int LimitTable = app.getFileSystemApp().getAssignTableSystem().getListFiles().size();
+        List<File> ListFiles = app.getFileSystemApp().getAssignTableSystem().getListFiles();
+
+        for (int i = 0; i < LimitTable; i++) {
+
+            String FileName = ListFiles.get(i).getFileName();
+            int InitialBlock = ListFiles.get(i).getFirstBlock().getId();
+            int Length = ListFiles.get(i).getBlocksList().size();
+            String ListaBloques = ListFiles.get(i).getBlocksList().travel2();
+
+            model.addRow(new Object[]{FileName, InitialBlock, Length, ListaBloques});
+
+        }
+
     }
 
     private void GuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GuardarActionPerformed
@@ -365,67 +520,100 @@ public class SimulatorFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_CreateButtonActionPerformed
 
     private void GuardarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarMouseClicked
-        /*
-    CREACION DEL ARCHIVO
-         */
 
-        if (this.SelectedNode != null) {
-            String ElementToCreate = ComboBoxCreateSelection.getModel().getSelectedItem().toString();
-            if (ElementToCreate.equalsIgnoreCase("Archivo")) {
-                // Creamos el File
-                String FileName = jTextField1.getText();
-                int BlockSize = jSlider1.getModel().getValue();
+        // CREACION DE ARCHIVOS Y DIRECTORIOS
+        // Verificar que se haya seleccionado un nodo en el árbol
+        if (this.SelectedNode == null) {
+            JOptionPane.showMessageDialog(null, "Seleccione una carpeta donde guardar", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-                // Verificar si ya existe un archivo con el mismo nombre en la misma carpeta
-                if (VerifyFile(FileName)) {
-                    JOptionPane.showMessageDialog(null, "Ya existe un archivo con el mismo nombre en esta carpeta.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
+        // Verificar directamente si el nodo seleccionado es un archivo, buscando la etiqueta " [A]"
+        String selectedNodeLabel = this.SelectedNode.getUserObject().toString();
 
-                File NewFile = new File(FileName, BlockSize, null, null, null);
+        if (selectedNodeLabel.contains(" [A]")) {
+            JOptionPane.showMessageDialog(null, "No se pueden crear archivos dentro de otros archivos", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-                boolean AccessToSD = app.getFileSystemApp().searchAndSet(NewFile.getBlockSize(), NewFile);
+        // Obtener el tipo de elemento a crear y el nombre ingresado
+        String elementToCreate = ComboBoxCreateSelection.getModel().getSelectedItem().toString();
+        String nameInput = jTextField1.getText().trim(); // archivo 1 --> archivo1 quitamos los espacios
 
-                if (AccessToSD) {
-                    System.out.println("El valor ha sido colocado en la SD");
+        if (nameInput.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "El nombre no puede estar vacio", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-                    // Colocando el nuevo nodo en la estructura jtree
-                    DefaultMutableTreeNode NewNode = new DefaultMutableTreeNode(NewFile.getFileName() + " [A]", false);
+        if (elementToCreate.equalsIgnoreCase("Archivo")) {
+            int blockSize = jSlider1.getModel().getValue();
 
-                    if (this.SelectedNode != null) {
-                        try {
-                            DefaultTreeModel Model = (DefaultTreeModel) this.FilesTree.getModel();
-                            Model.insertNodeInto(NewNode, this.SelectedNode, this.SelectedNode.getChildCount());
-                            app.getFileSystemApp().getAssignTableSystem().getListFiles().append(NewFile);
-                            //Falta agregar el archivo a los archivos del directorio padre
-                            UpdateTextArea();
-                        } catch (Exception e) {
-                            // Se intentó agregar un archivo dentro de otro: Manejamos el error.
-                            System.out.println("Ocurrió un error: " + e.getMessage());
-                            JOptionPane.showMessageDialog(null, "No se pueden crear archivos dentro de otros archivos.", "Error", JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
-                }
-            } else {
-                String DirectoryName = jTextField1.getText();
-                System.out.println(DirectoryName);
-                Directory NewDirectory = new Directory(DirectoryName, null, null);
-                DefaultMutableTreeNode NewNode = new DefaultMutableTreeNode(NewDirectory.getDirectoryName() + " [D]", true);
-                //NewNode.setUserObject(NewDirectory);
-                //NewNode.setIcon(folderIcon);
+            // Verificar si ya existe un archivo con el mismo nombre en la misma carpeta
+            if (VerifyFile(nameInput)) {
+                JOptionPane.showMessageDialog(null, "Ya existe un archivo con el mismo nombre en esta carpeta", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-                if (this.SelectedNode != null) {
-                    DefaultTreeModel Model = (DefaultTreeModel) this.FilesTree.getModel();
-                    Model.insertNodeInto(NewNode, this.SelectedNode, this.SelectedNode.getChildCount());
-                    //NewNode.setUserObject(NewDirectory);
-                }
-                
-                //Falta agregar el directorio a los directorios del padre
+            File newFile = new File(nameInput, blockSize, null, null, null);
+
+            boolean accessToSD = app.getFileSystemApp().searchAndSet(newFile.getBlockSize(), newFile);
+
+            if (!accessToSD) {
+                JOptionPane.showMessageDialog(null, "No se pudo asignar el archivo en el sistema", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            System.out.println("El archivo ha sido colocado en la SD");
+
+            // Crear el nodo del árbol; 'false' indica que no permite hijos (archivo)
+            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newFile.getFileName() + " [A]", false);
+
+            try {
+
+                DefaultTreeModel model = (DefaultTreeModel) this.FilesTree.getModel();
+                model.insertNodeInto(newNode, this.SelectedNode, this.SelectedNode.getChildCount());
+
+                // Agregar el archivo a la lista del sistema
+                app.getFileSystemApp().getAssignTableSystem().getListFiles().append(newFile);
+
+                // Actualizar la interfaz
+                PanelBlocksUpdate();
+
+                updateAssignmentTable();
+
+            } catch (Exception e) {
+                // PENDIENTE CON ESTE CATCH
+
+                System.out.println("Ocurrió un error al agregar el archivo: " + e.getMessage());
+                JOptionPane.showMessageDialog(null, "No se pueden crear archivos dentro de otros archivos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } else {
+
+            if (VerifyDirectory(nameInput)) {
+                JOptionPane.showMessageDialog(null, "Ya existe un directorio con el mismo nombre en esta carpeta", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // CREO QUE LOS OTROS 2 ATRUBUTOS DE DIRECTORY YA NO SON NECESARIOS GRACIAS A LOS METODOS DEL JTREE
+            Directory newDirectory = new Directory(nameInput, null, null);
+
+            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newDirectory.getDirectoryName() + " [D]", true);
+
+            try {
+
+                DefaultTreeModel model = (DefaultTreeModel) this.FilesTree.getModel();
+                model.insertNodeInto(newNode, this.SelectedNode, this.SelectedNode.getChildCount());
+
+                // Aquí se debe agregar el directorio a la estructura lógica del sistema,
+                // por ejemplo, agregándolo a la lista de directorios del padre
+            } catch (Exception e) {
+
+                System.out.println("Ocurrió un error al agregar el directorio: " + e.getMessage());
+                JOptionPane.showMessageDialog(null, "Error al crear el directorio.", "Error", JOptionPane.ERROR_MESSAGE);
             }
 
         }
-
-
     }//GEN-LAST:event_GuardarMouseClicked
 
     private void UpdateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UpdateButtonActionPerformed
@@ -441,7 +629,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
             CreateButton.setVisible(false);
             DeleteButton.setVisible(false);
             UpdateButton.setVisible(false);
-            
+
             //Ocultamos otras opciones
             jLabel5.setVisible(false);
             jSlider1.setVisible(false);
@@ -451,7 +639,6 @@ public class SimulatorFrame extends javax.swing.JFrame {
             jTextField1.setVisible(false);
             Guardar.setVisible(false);
             jLabel1.setVisible(false);
-            
 
         } else {
             CreateButton.setVisible(true);
@@ -515,10 +702,10 @@ public class SimulatorFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSlider jSlider1;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }
