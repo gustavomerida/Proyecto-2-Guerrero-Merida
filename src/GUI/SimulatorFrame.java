@@ -390,21 +390,37 @@ public class SimulatorFrame extends javax.swing.JFrame {
                     System.out.println("El valor ha sido colocado en la SD");
 
                     // Colocando el nuevo nodo en la estructura jtree
-                    DefaultMutableTreeNode NewNode = new DefaultMutableTreeNode(NewFile.getFileName());
+                    DefaultMutableTreeNode NewNode = new DefaultMutableTreeNode(NewFile.getFileName() + " [A]", false);
 
                     if (this.SelectedNode != null) {
-                        DefaultTreeModel Model = (DefaultTreeModel) this.FilesTree.getModel();
-                        Model.insertNodeInto(NewNode, this.SelectedNode, this.SelectedNode.getChildCount());
-                        app.getFileSystemApp().getAssignTableSystem().getListFiles().append(NewFile);
-                        
-                        UpdateTextArea();
-
+                        try {
+                            DefaultTreeModel Model = (DefaultTreeModel) this.FilesTree.getModel();
+                            Model.insertNodeInto(NewNode, this.SelectedNode, this.SelectedNode.getChildCount());
+                            app.getFileSystemApp().getAssignTableSystem().getListFiles().append(NewFile);
+                            //Falta agregar el archivo a los archivos del directorio padre
+                            UpdateTextArea();
+                        } catch (Exception e) {
+                            // Se intentó agregar un archivo dentro de otro: Manejamos el error.
+                            System.out.println("Ocurrió un error: " + e.getMessage());
+                            JOptionPane.showMessageDialog(null, "No se pueden crear archivos dentro de otros archivos.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 }
             } else {
-                // NO SE COMO VAMOS A MANEJAR ESTO
                 String DirectoryName = jTextField1.getText();
+                System.out.println(DirectoryName);
                 Directory NewDirectory = new Directory(DirectoryName, null, null);
+                DefaultMutableTreeNode NewNode = new DefaultMutableTreeNode(NewDirectory.getDirectoryName() + " [D]", true);
+                //NewNode.setUserObject(NewDirectory);
+                //NewNode.setIcon(folderIcon);
+
+                if (this.SelectedNode != null) {
+                    DefaultTreeModel Model = (DefaultTreeModel) this.FilesTree.getModel();
+                    Model.insertNodeInto(NewNode, this.SelectedNode, this.SelectedNode.getChildCount());
+                    //NewNode.setUserObject(NewDirectory);
+                }
+                
+                //Falta agregar el directorio a los directorios del padre
             }
 
         }
