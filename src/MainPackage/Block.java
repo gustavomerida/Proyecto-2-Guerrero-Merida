@@ -26,7 +26,7 @@ public class Block {
     }
 
     public int getId() {
-        return id;
+        return id + 1;
     }
 
     public void setId(int id) {

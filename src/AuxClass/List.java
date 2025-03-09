@@ -108,7 +108,7 @@ public class List<T> {
         if (this.isEmpty()) {
             return "Está vacía";
         }
-
+        
         while (pAux != this.last()) {
             T info = pAux.gettInfo(); // Obtener el valor del nodo
 

@@ -14,8 +14,6 @@ import MainClasses.App;
  */
 public class SD {
 
-    
-
     private int LimitBlocks;
     private List<Block> BlocksList;
 
