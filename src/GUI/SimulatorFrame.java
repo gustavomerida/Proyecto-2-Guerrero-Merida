@@ -61,8 +61,8 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        UpdateButton = new javax.swing.JButton();
+        CreateButton = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         ComboBoxCreateSelection = new javax.swing.JComboBox<>();
@@ -71,7 +71,9 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jSlider1 = new javax.swing.JSlider();
         Guardar = new javax.swing.JButton();
         SliderValueLabel = new javax.swing.JLabel();
-        jButton4 = new javax.swing.JButton();
+        DeleteButton = new javax.swing.JButton();
+        ComboBoxUserMode = new javax.swing.JComboBox<>();
+        jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -149,27 +151,32 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jPanel1.add(jLabel4);
         jLabel4.setBounds(710, 310, 50, 16);
 
-        jButton1.setText("Actualizar");
-        jPanel1.add(jButton1);
-        jButton1.setBounds(20, 340, 82, 23);
-
-        jButton3.setText("Crear");
-        jButton3.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jButton3MouseClicked(evt);
-            }
-        });
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        UpdateButton.setText("Actualizar");
+        UpdateButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                UpdateButtonActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton3);
-        jButton3.setBounds(20, 280, 72, 23);
+        jPanel1.add(UpdateButton);
+        UpdateButton.setBounds(20, 360, 100, 23);
+
+        CreateButton.setText("Crear");
+        CreateButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                CreateButtonMouseClicked(evt);
+            }
+        });
+        CreateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CreateButtonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(CreateButton);
+        CreateButton.setBounds(20, 280, 100, 23);
 
         jLabel5.setText("Nombre del Archivo");
         jPanel1.add(jLabel5);
-        jLabel5.setBounds(130, 330, 120, 16);
+        jLabel5.setBounds(150, 330, 150, 16);
 
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -177,7 +184,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
         jPanel1.add(jTextField1);
-        jTextField1.setBounds(290, 330, 170, 22);
+        jTextField1.setBounds(310, 330, 170, 22);
 
         ComboBoxCreateSelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Archivo", "Directorio" }));
         ComboBoxCreateSelection.addActionListener(new java.awt.event.ActionListener() {
@@ -186,16 +193,16 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
         jPanel1.add(ComboBoxCreateSelection);
-        ComboBoxCreateSelection.setBounds(290, 280, 86, 22);
+        ComboBoxCreateSelection.setBounds(290, 280, 88, 22);
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("¿Qué desea crear?");
         jPanel1.add(jLabel1);
-        jLabel1.setBounds(110, 270, 130, 40);
+        jLabel1.setBounds(130, 270, 130, 40);
 
         jLabel6.setText("Tamaño en Bloques");
         jPanel1.add(jLabel6);
-        jLabel6.setBounds(130, 380, 120, 16);
+        jLabel6.setBounds(150, 380, 120, 16);
 
         jSlider1.setMaximum(20);
         jSlider1.setMinimum(1);
@@ -228,9 +235,22 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jPanel1.add(SliderValueLabel);
         SliderValueLabel.setBounds(480, 380, 20, 20);
 
-        jButton4.setText("Eliminar");
-        jPanel1.add(jButton4);
-        jButton4.setBounds(20, 310, 73, 23);
+        DeleteButton.setText("Eliminar");
+        jPanel1.add(DeleteButton);
+        DeleteButton.setBounds(20, 320, 100, 23);
+
+        ComboBoxUserMode.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Modo Usuario", "Modo Administrador" }));
+        ComboBoxUserMode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ComboBoxUserModeActionPerformed(evt);
+            }
+        });
+        jPanel1.add(ComboBoxUserMode);
+        ComboBoxUserMode.setBounds(30, 490, 145, 22);
+
+        jLabel9.setText("Modos de usuario:");
+        jPanel1.add(jLabel9);
+        jLabel9.setBounds(30, 470, 140, 20);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -256,6 +276,10 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jTextField1.setVisible(false);
         jSlider1.setVisible(false);
         Guardar.setVisible(false);
+        SliderValueLabel.setVisible(false);
+        CreateButton.setVisible(false);
+        DeleteButton.setVisible(false);
+        UpdateButton.setVisible(false);
     }
 
     private void UpdateTextArea() {
@@ -280,15 +304,19 @@ public class SimulatorFrame extends javax.swing.JFrame {
         String selectedItem = this.ComboBoxCreateSelection.getModel().getSelectedItem().toString();
 
         if (selectedItem.equalsIgnoreCase("Archivo")) {
-            JLabelArray[0].setText("Nombre del Archivo");
+            JLabelArray[1].setText("Nombre del Archivo"); //aquí cambié a JLabelArray[1]
 
             JLabelArray[1].setVisible(true);
             this.jSlider1.setVisible(true);
+            SliderValueLabel.setVisible(true);
+            jLabel6.setVisible(true);
 
         } else {
-            JLabelArray[0].setText("Nombre del Directorio");
-            JLabelArray[1].setVisible(false);
+            JLabelArray[1].setText("Nombre del Directorio"); //aquí cambié a JLabelArray[1]
+            JLabelArray[1].setVisible(true);
             this.jSlider1.setVisible(false);
+            SliderValueLabel.setVisible(false);
+            jLabel6.setVisible(false);
         }
     }//GEN-LAST:event_ComboBoxCreateSelectionActionPerformed
 
@@ -318,7 +346,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
         //
     }//GEN-LAST:event_GuardarActionPerformed
 
-    private void jButton3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton3MouseClicked
+    private void CreateButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CreateButtonMouseClicked
 
         JLabel[] CreateLabels = {jLabel1, jLabel5, jLabel6};
         for (int i = 0; i < CreateLabels.length; i++) {
@@ -328,12 +356,13 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jTextField1.setVisible(true);
         jSlider1.setVisible(true);
         Guardar.setVisible(true);
+        SliderValueLabel.setVisible(true);
 
-    }//GEN-LAST:event_jButton3MouseClicked
+    }//GEN-LAST:event_CreateButtonMouseClicked
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void CreateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateButtonActionPerformed
 
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_CreateButtonActionPerformed
 
     private void GuardarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarMouseClicked
         /*
@@ -361,27 +390,75 @@ public class SimulatorFrame extends javax.swing.JFrame {
                     System.out.println("El valor ha sido colocado en la SD");
 
                     // Colocando el nuevo nodo en la estructura jtree
-                    DefaultMutableTreeNode NewNode = new DefaultMutableTreeNode(NewFile.getFileName());
+                    DefaultMutableTreeNode NewNode = new DefaultMutableTreeNode(NewFile.getFileName() + " [A]", false);
 
                     if (this.SelectedNode != null) {
-                        DefaultTreeModel Model = (DefaultTreeModel) this.FilesTree.getModel();
-                        Model.insertNodeInto(NewNode, this.SelectedNode, this.SelectedNode.getChildCount());
-                        app.getFileSystemApp().getAssignTableSystem().getListFiles().append(NewFile);
-                        
-                        UpdateTextArea();
-
+                        try {
+                            DefaultTreeModel Model = (DefaultTreeModel) this.FilesTree.getModel();
+                            Model.insertNodeInto(NewNode, this.SelectedNode, this.SelectedNode.getChildCount());
+                            app.getFileSystemApp().getAssignTableSystem().getListFiles().append(NewFile);
+                            //Falta agregar el archivo a los archivos del directorio padre
+                            UpdateTextArea();
+                        } catch (Exception e) {
+                            // Se intentó agregar un archivo dentro de otro: Manejamos el error.
+                            System.out.println("Ocurrió un error: " + e.getMessage());
+                            JOptionPane.showMessageDialog(null, "No se pueden crear archivos dentro de otros archivos.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 }
             } else {
-                // NO SE COMO VAMOS A MANEJAR ESTO
                 String DirectoryName = jTextField1.getText();
+                System.out.println(DirectoryName);
                 Directory NewDirectory = new Directory(DirectoryName, null, null);
+                DefaultMutableTreeNode NewNode = new DefaultMutableTreeNode(NewDirectory.getDirectoryName() + " [D]", true);
+                //NewNode.setUserObject(NewDirectory);
+                //NewNode.setIcon(folderIcon);
+
+                if (this.SelectedNode != null) {
+                    DefaultTreeModel Model = (DefaultTreeModel) this.FilesTree.getModel();
+                    Model.insertNodeInto(NewNode, this.SelectedNode, this.SelectedNode.getChildCount());
+                    //NewNode.setUserObject(NewDirectory);
+                }
+                
+                //Falta agregar el directorio a los directorios del padre
             }
 
         }
 
 
     }//GEN-LAST:event_GuardarMouseClicked
+
+    private void UpdateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UpdateButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_UpdateButtonActionPerformed
+
+    private void ComboBoxUserModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxUserModeActionPerformed
+        // Logica para el modo de usuario
+        String selectedItem = this.ComboBoxUserMode.getModel().getSelectedItem().toString();
+
+        if (selectedItem.equalsIgnoreCase("Modo Usuario")) {
+            //Deshabilitamos las opciones de administrador
+            CreateButton.setVisible(false);
+            DeleteButton.setVisible(false);
+            UpdateButton.setVisible(false);
+            
+            //Ocultamos otras opciones
+            jLabel5.setVisible(false);
+            jSlider1.setVisible(false);
+            SliderValueLabel.setVisible(false);
+            jLabel6.setVisible(false);
+            ComboBoxCreateSelection.setVisible(false);
+            jTextField1.setVisible(false);
+            Guardar.setVisible(false);
+            jLabel1.setVisible(false);
+            
+
+        } else {
+            CreateButton.setVisible(true);
+            DeleteButton.setVisible(true);
+            UpdateButton.setVisible(true);
+        }
+    }//GEN-LAST:event_ComboBoxUserModeActionPerformed
 
     /**
      * @param args the command line arguments
@@ -420,18 +497,20 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> ComboBoxCreateSelection;
+    private javax.swing.JComboBox<String> ComboBoxUserMode;
+    private javax.swing.JButton CreateButton;
+    private javax.swing.JButton DeleteButton;
     private javax.swing.JTree FilesTree;
     private javax.swing.JButton Guardar;
     private javax.swing.JLabel SliderValueLabel;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton UpdateButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
