@@ -89,6 +89,7 @@ public class App {
     public void start() {
         System.out.println("Runneando");
         SimulatorFrame SimulatorFrameWindow = new SimulatorFrame();
+        SimulatorFrameWindow.setLocationRelativeTo(null);
         SimulatorFrameWindow.setVisible(true);
 //        testSearchAndSet();
     }

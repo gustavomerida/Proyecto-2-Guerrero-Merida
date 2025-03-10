@@ -15,7 +15,9 @@ import MainPackage.File;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.util.Enumeration;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -25,6 +27,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.ListModel;
@@ -51,11 +54,15 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
     private List<DefaultListModel> listModels = new List<>("LISTA MODELOS");
     private List<JList> jLists = new List<>("LISTA JLISTS");
+    
+    BGPane bg = new BGPane();
 
     public SimulatorFrame() {
-
+        this.setContentPane(bg);
         initComponents();
+        setIconImage(new ImageIcon(getClass().getResource("/Images/mainicon.png")).getImage());
         SimulatorInit();
+        
 
         Model = new DefaultTreeModel(new DefaultMutableTreeNode("root"));
         this.FilesTree.setModel(Model);
@@ -77,7 +84,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
+        jPanel1 = new BGPane();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         FilesTree = new javax.swing.JTree();
@@ -101,6 +108,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
         DeleteButton = new javax.swing.JButton();
         ComboBoxUserMode = new javax.swing.JComboBox<>();
         jLabel9 = new javax.swing.JLabel();
+        SaveJSONButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -168,34 +176,82 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jPanel1.add(jPanel4);
         jPanel4.setBounds(10, 30, 470, 190);
 
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("ASSIGN TABLE");
         jPanel1.add(jLabel2);
-        jLabel2.setBounds(210, 10, 90, 16);
+        jLabel2.setBounds(180, 10, 130, 20);
 
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("JTREE");
         jPanel1.add(jLabel3);
-        jLabel3.setBounds(700, 10, 90, 16);
+        jLabel3.setBounds(700, 10, 90, 17);
 
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText("SD");
         jPanel1.add(jLabel4);
-        jLabel4.setBounds(710, 310, 50, 16);
+        jLabel4.setBounds(710, 320, 50, 20);
 
+        UpdateButton.setBackground(new java.awt.Color(51, 153, 255));
+        UpdateButton.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        UpdateButton.setForeground(new java.awt.Color(255, 255, 255));
+        UpdateButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/design.png"))); // NOI18N
         UpdateButton.setText("Actualizar");
+        UpdateButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        UpdateButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        UpdateButton.setIconTextGap(10);
+        UpdateButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                UpdateButtonMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                UpdateButtonMouseExited(evt);
+            }
+        });
         UpdateButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 UpdateButtonActionPerformed(evt);
             }
         });
         jPanel1.add(UpdateButton);
-        UpdateButton.setBounds(20, 360, 100, 23);
+        UpdateButton.setBounds(20, 360, 100, 26);
 
+        CreateButton.setBackground(new java.awt.Color(0, 153, 102));
+        CreateButton.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        CreateButton.setForeground(new java.awt.Color(255, 255, 255));
+        CreateButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/plus.png"))); // NOI18N
         CreateButton.setText("Crear");
+        CreateButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        CreateButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        CreateButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        CreateButton.setIconTextGap(10);
+        CreateButton.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                CreateButtonMouseDragged(evt);
+            }
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                CreateButtonMouseMoved(evt);
+            }
+        });
+        CreateButton.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                CreateButtonFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                CreateButtonFocusLost(evt);
+            }
+        });
         CreateButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 CreateButtonMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                CreateButtonMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                CreateButtonMouseExited(evt);
             }
         });
         CreateButton.addActionListener(new java.awt.event.ActionListener() {
@@ -204,11 +260,14 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
         jPanel1.add(CreateButton);
-        CreateButton.setBounds(20, 280, 100, 23);
+        CreateButton.setBounds(20, 280, 100, 26);
 
+        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel5.setText("Nombre del Archivo");
+        jLabel5.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         jPanel1.add(jLabel5);
-        jLabel5.setBounds(150, 330, 150, 16);
+        jLabel5.setBounds(140, 330, 150, 16);
 
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -216,7 +275,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
         jPanel1.add(jTextField1);
-        jTextField1.setBounds(310, 330, 170, 22);
+        jTextField1.setBounds(300, 330, 170, 22);
 
         ComboBoxCreateSelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Archivo", "Directorio" }));
         ComboBoxCreateSelection.addActionListener(new java.awt.event.ActionListener() {
@@ -225,16 +284,20 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
         jPanel1.add(ComboBoxCreateSelection);
-        ComboBoxCreateSelection.setBounds(290, 280, 86, 22);
+        ComboBoxCreateSelection.setBounds(290, 280, 88, 22);
 
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("¿Qué desea crear?");
+        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         jPanel1.add(jLabel1);
         jLabel1.setBounds(130, 270, 130, 40);
 
+        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel6.setText("Tamaño en Bloques");
         jPanel1.add(jLabel6);
-        jLabel6.setBounds(150, 380, 120, 16);
+        jLabel6.setBounds(140, 380, 120, 15);
 
         jSlider1.setMaximum(20);
         jSlider1.setMinimum(1);
@@ -249,10 +312,22 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jPanel1.add(jSlider1);
         jSlider1.setBounds(280, 380, 200, 28);
 
+        Guardar.setBackground(new java.awt.Color(0, 102, 102));
+        Guardar.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        Guardar.setForeground(new java.awt.Color(255, 255, 255));
+        Guardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/forward.png"))); // NOI18N
         Guardar.setText("Guardar");
+        Guardar.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        Guardar.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         Guardar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 GuardarMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                GuardarMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                GuardarMouseExited(evt);
             }
         });
         Guardar.addActionListener(new java.awt.event.ActionListener() {
@@ -261,28 +336,68 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
         jPanel1.add(Guardar);
-        Guardar.setBounds(250, 430, 72, 23);
+        Guardar.setBounds(250, 430, 90, 26);
 
         SliderValueLabel.setText("1");
         jPanel1.add(SliderValueLabel);
         SliderValueLabel.setBounds(480, 380, 20, 20);
 
+        DeleteButton.setBackground(new java.awt.Color(255, 102, 102));
+        DeleteButton.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        DeleteButton.setForeground(new java.awt.Color(255, 255, 255));
+        DeleteButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/bin.png"))); // NOI18N
         DeleteButton.setText("Eliminar");
+        DeleteButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        DeleteButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        DeleteButton.setIconTextGap(10);
+        DeleteButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                DeleteButtonMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                DeleteButtonMouseExited(evt);
+            }
+        });
+        DeleteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DeleteButtonActionPerformed(evt);
+            }
+        });
         jPanel1.add(DeleteButton);
-        DeleteButton.setBounds(20, 320, 100, 23);
+        DeleteButton.setBounds(20, 320, 100, 26);
 
         ComboBoxUserMode.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Modo Usuario", "Modo Administrador" }));
+        ComboBoxUserMode.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         ComboBoxUserMode.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ComboBoxUserModeActionPerformed(evt);
             }
         });
         jPanel1.add(ComboBoxUserMode);
-        ComboBoxUserMode.setBounds(30, 490, 146, 22);
+        ComboBoxUserMode.setBounds(30, 490, 153, 30);
 
+        jLabel9.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel9.setText("Modos de usuario:");
         jPanel1.add(jLabel9);
         jLabel9.setBounds(30, 470, 140, 20);
+
+        SaveJSONButton.setBackground(new java.awt.Color(102, 102, 102));
+        SaveJSONButton.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        SaveJSONButton.setForeground(new java.awt.Color(255, 255, 255));
+        SaveJSONButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/diskette.png"))); // NOI18N
+        SaveJSONButton.setText("Guardar archivos");
+        SaveJSONButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        SaveJSONButton.setIconTextGap(10);
+        SaveJSONButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                SaveJSONButtonMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                SaveJSONButtonMouseExited(evt);
+            }
+        });
+        jPanel1.add(SaveJSONButton);
+        SaveJSONButton.setBounds(20, 230, 140, 30);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -328,7 +443,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
     
     // SE DEBE VER CUANDO EXPLOTE
-    private void PanelBlocksUpdate() {
+    private void PanelBlocksUpdate(String fileName) {
         Node<Block> currentBlock = app.getSDApp().getBlocksList().first();
         int index = 0;
 
@@ -338,9 +453,9 @@ public class SimulatorFrame extends javax.swing.JFrame {
             // this.jLists.get(index).setCellRenderer(new ColorRenderer()); // EN ETAPA DE PRUEBAS.
             
             // SE MODIFICA LA SEGUNDA STRING DEL MODEL
-            if (currentBlock.gettInfo().isState()) {
-                model.set(1, "Ocupado");
-            } else {
+            if (currentBlock.gettInfo().isState() && model.get(1).equals("Libre")) {
+                model.set(1, fileName);
+            } else if (model.get(1).equals("Libre")){
                 model.set(1, "Libre");
             }
             currentBlock = currentBlock.getpNext();
@@ -577,7 +692,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
                 app.getFileSystemApp().getAssignTableSystem().getListFiles().append(newFile);
 
                 // Actualizar la interfaz
-                PanelBlocksUpdate();
+                PanelBlocksUpdate(nameInput);
 
                 updateAssignmentTable();
 
@@ -647,6 +762,76 @@ public class SimulatorFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_ComboBoxUserModeActionPerformed
 
+    private void DeleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_DeleteButtonActionPerformed
+
+    private void CreateButtonFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_CreateButtonFocusGained
+
+    }//GEN-LAST:event_CreateButtonFocusGained
+
+    private void CreateButtonFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_CreateButtonFocusLost
+
+    }//GEN-LAST:event_CreateButtonFocusLost
+
+    private void CreateButtonMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CreateButtonMouseDragged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_CreateButtonMouseDragged
+
+    private void CreateButtonMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CreateButtonMouseMoved
+        // TODO add your handling code here:
+    }//GEN-LAST:event_CreateButtonMouseMoved
+
+    private void CreateButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CreateButtonMouseExited
+        // TODO add your handling code here:
+        CreateButton.setBackground(new Color(0,153,102));
+    }//GEN-LAST:event_CreateButtonMouseExited
+
+    private void CreateButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CreateButtonMouseEntered
+        // TODO add your handling code here:
+        CreateButton.setBackground(new Color(0,102,51));
+    }//GEN-LAST:event_CreateButtonMouseEntered
+
+    private void DeleteButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DeleteButtonMouseEntered
+        // TODO add your handling code here:
+        DeleteButton.setBackground(new Color(255,51,0));
+    }//GEN-LAST:event_DeleteButtonMouseEntered
+
+    private void DeleteButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DeleteButtonMouseExited
+        // TODO add your handling code here:
+        DeleteButton.setBackground(new Color(255,102,102));
+    }//GEN-LAST:event_DeleteButtonMouseExited
+
+    private void SaveJSONButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SaveJSONButtonMouseEntered
+        // TODO add your handling code here:
+        SaveJSONButton.setBackground(new Color(51,51,51));
+    }//GEN-LAST:event_SaveJSONButtonMouseEntered
+
+    private void SaveJSONButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SaveJSONButtonMouseExited
+        // TODO add your handling code here:
+        SaveJSONButton.setBackground(new Color(102,102,102));
+    }//GEN-LAST:event_SaveJSONButtonMouseExited
+
+    private void UpdateButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_UpdateButtonMouseEntered
+        // TODO add your handling code here:
+        UpdateButton.setBackground(new Color(0,102,255));
+    }//GEN-LAST:event_UpdateButtonMouseEntered
+
+    private void UpdateButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_UpdateButtonMouseExited
+        // TODO add your handling code here:
+        UpdateButton.setBackground(new Color(51,153,255));
+    }//GEN-LAST:event_UpdateButtonMouseExited
+
+    private void GuardarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarMouseEntered
+        // TODO add your handling code here:
+        Guardar.setBackground(new Color(0,51,51));
+    }//GEN-LAST:event_GuardarMouseEntered
+
+    private void GuardarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarMouseExited
+        // TODO add your handling code here:
+        Guardar.setBackground(new Color(0,102,102));
+    }//GEN-LAST:event_GuardarMouseExited
+
     /**
      * @param args the command line arguments
      */
@@ -689,6 +874,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
     private javax.swing.JButton DeleteButton;
     private javax.swing.JTree FilesTree;
     private javax.swing.JButton Guardar;
+    private javax.swing.JButton SaveJSONButton;
     private javax.swing.JLabel SliderValueLabel;
     private javax.swing.JButton UpdateButton;
     private javax.swing.JLabel jLabel1;
@@ -708,4 +894,20 @@ public class SimulatorFrame extends javax.swing.JFrame {
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
+
+    
+    class BGPane extends JPanel {
+        private Image imagen;
+
+        @Override
+        public void paint(Graphics g) {
+            imagen = new ImageIcon(getClass().getResource("../Images/background.jpg")).getImage();
+            g.drawImage(imagen, 0, 0, getWidth(), getHeight(), this);
+            
+            setOpaque(false);
+            
+            super.paint(g);
+        }
+    }
+    
 }
