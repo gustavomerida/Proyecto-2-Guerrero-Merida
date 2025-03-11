@@ -109,6 +109,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
         ComboBoxUserMode = new javax.swing.JComboBox<>();
         jLabel9 = new javax.swing.JLabel();
         SaveJSONButton = new javax.swing.JButton();
+        GuardarCambios = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -203,6 +204,9 @@ public class SimulatorFrame extends javax.swing.JFrame {
         UpdateButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         UpdateButton.setIconTextGap(10);
         UpdateButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                UpdateButtonMouseClicked(evt);
+            }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 UpdateButtonMouseEntered(evt);
             }
@@ -336,7 +340,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
         jPanel1.add(Guardar);
-        Guardar.setBounds(250, 430, 90, 26);
+        Guardar.setBounds(280, 430, 90, 26);
 
         SliderValueLabel.setText("1");
         jPanel1.add(SliderValueLabel);
@@ -398,6 +402,32 @@ public class SimulatorFrame extends javax.swing.JFrame {
         });
         jPanel1.add(SaveJSONButton);
         SaveJSONButton.setBounds(20, 230, 140, 30);
+
+        GuardarCambios.setBackground(new java.awt.Color(0, 102, 102));
+        GuardarCambios.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        GuardarCambios.setForeground(new java.awt.Color(255, 255, 255));
+        GuardarCambios.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/forward.png"))); // NOI18N
+        GuardarCambios.setText("Guardar");
+        GuardarCambios.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        GuardarCambios.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        GuardarCambios.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                GuardarCambiosMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                GuardarCambiosMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                GuardarCambiosMouseExited(evt);
+            }
+        });
+        GuardarCambios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                GuardarCambiosActionPerformed(evt);
+            }
+        });
+        jPanel1.add(GuardarCambios);
+        GuardarCambios.setBounds(180, 430, 90, 26);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -477,6 +507,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
         CreateButton.setVisible(false);
         DeleteButton.setVisible(false);
         UpdateButton.setVisible(false);
+        GuardarCambios.setVisible(false);
     }
 
     private void configurarTreeRenderer() {
@@ -617,7 +648,12 @@ public class SimulatorFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_GuardarActionPerformed
 
     private void CreateButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CreateButtonMouseClicked
-
+        String selectedItem = this.ComboBoxCreateSelection.getModel().getSelectedItem().toString();
+        if (selectedItem.equalsIgnoreCase("Archivo")) {
+            jLabel5.setText("Nombre del Archivo");
+        } else {
+            jLabel5.setText("Nombre del Directorio");
+        }
         JLabel[] CreateLabels = {jLabel1, jLabel5, jLabel6};
         for (int i = 0; i < CreateLabels.length; i++) {
             CreateLabels[i].setVisible(true);
@@ -627,6 +663,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jSlider1.setVisible(true);
         Guardar.setVisible(true);
         SliderValueLabel.setVisible(true);
+        GuardarCambios.setVisible(false);
 
     }//GEN-LAST:event_CreateButtonMouseClicked
 
@@ -754,6 +791,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
             jTextField1.setVisible(false);
             Guardar.setVisible(false);
             jLabel1.setVisible(false);
+            GuardarCambios.setVisible(false);
 
         } else {
             CreateButton.setVisible(true);
@@ -832,6 +870,72 @@ public class SimulatorFrame extends javax.swing.JFrame {
         Guardar.setBackground(new Color(0,102,102));
     }//GEN-LAST:event_GuardarMouseExited
 
+    private void UpdateButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_UpdateButtonMouseClicked
+        // MODIFICAR EL NOMBRE DE UN ARCHIVO O DIRECTORIO
+        
+        
+        jLabel5.setVisible(false);
+        jSlider1.setVisible(false);
+        SliderValueLabel.setVisible(false);
+        jLabel6.setVisible(false);
+        ComboBoxCreateSelection.setVisible(false);
+        jTextField1.setVisible(false);
+        Guardar.setVisible(false);
+        jLabel1.setVisible(false);
+        GuardarCambios.setVisible(false);
+            
+            
+        // Verificar que se haya seleccionado un nodo en el árbol
+        if (this.SelectedNode == null) {
+            JOptionPane.showMessageDialog(null, "Seleccione una carpeta o archivo para cambiar su nombre", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        //Pedir el nombre
+        jTextField1.setVisible(true);
+        String createName = jLabel5.getText();
+        
+        jLabel5.setText("Nombre nuevo");
+        jLabel5.setVisible(true);
+        GuardarCambios.setVisible(true);
+        
+       
+    }//GEN-LAST:event_UpdateButtonMouseClicked
+
+    private void GuardarCambiosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarCambiosMouseClicked
+        //Lógica del cambio de nombre
+        String currentSelectedNodeLabel = this.SelectedNode.getUserObject().toString(); //Nombre actual con [A] o [D]
+        String newNameInput = jTextField1.getText().trim(); // Nuevo nombre
+        
+        //Cambiar nombre en el JTree
+        if (currentSelectedNodeLabel.contains(" [A]")) {
+            this.SelectedNode.setUserObject(newNameInput + " [A]");
+        }else {
+            this.SelectedNode.setUserObject(newNameInput + " [D]");
+        }
+        
+        
+        //Cambiar nombre en el JTable
+            //Aquí estoy pensando cómo hacer para editar nada más ese archivo y no uno que se llame igual pero esté en otra ruta.
+        
+        //Cambiar nombre en el SD
+            //Mismo tema
+            
+        //Mensaje de confirmación.
+        JOptionPane.showMessageDialog(null, "Nombre cambiado exitosamente");
+    }//GEN-LAST:event_GuardarCambiosMouseClicked
+
+    private void GuardarCambiosMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarCambiosMouseEntered
+        GuardarCambios.setBackground(new Color(0,51,51));
+    }//GEN-LAST:event_GuardarCambiosMouseEntered
+
+    private void GuardarCambiosMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarCambiosMouseExited
+        GuardarCambios.setBackground(new Color(0,102,102));
+    }//GEN-LAST:event_GuardarCambiosMouseExited
+
+    private void GuardarCambiosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GuardarCambiosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_GuardarCambiosActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -874,6 +978,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
     private javax.swing.JButton DeleteButton;
     private javax.swing.JTree FilesTree;
     private javax.swing.JButton Guardar;
+    private javax.swing.JButton GuardarCambios;
     private javax.swing.JButton SaveJSONButton;
     private javax.swing.JLabel SliderValueLabel;
     private javax.swing.JButton UpdateButton;
