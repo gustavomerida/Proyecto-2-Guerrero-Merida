@@ -11,8 +11,9 @@ import AuxClass.List;
  * @author Angelo
  */
 public class File {
+
     private String FileName;
-    private int BlockSize; 
+    private int BlockSize;
     // private String FileType;
     private Block FirstBlock;
     private List<Block> BlocksList;
@@ -25,6 +26,13 @@ public class File {
         this.FirstBlock = null; // Apuntador al primer bloque
         this.BlocksList = null; // Lista de los bloques a colorear
         this.ParentDirectory = ParentDirectory; // Directorio Padre
+    }
+    
+    
+//     PARA EL CASO DE MOSTRAR LA INFO DEL JTREE.
+    @Override
+    public String toString() {
+        return FileName + " [A]"; 
     }
 
     public String getFileName() {
@@ -42,7 +50,8 @@ public class File {
     public void setBlockSize(int BlockSize) {
         this.BlockSize = BlockSize;
     }
-/*
+
+    /*
     public String getFileType() {
         return FileType;
     }
@@ -50,7 +59,7 @@ public class File {
     public void setFileType(String FileType) {
         this.FileType = FileType;
     }
-*/
+     */
     public Block getFirstBlock() {
         return FirstBlock;
     }

@@ -54,7 +54,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
     private List<DefaultListModel> listModels = new List<>("LISTA MODELOS");
     private List<JList> jLists = new List<>("LISTA JLISTS");
-    
+
     BGPane bg = new BGPane();
 
     public SimulatorFrame() {
@@ -62,7 +62,6 @@ public class SimulatorFrame extends javax.swing.JFrame {
         initComponents();
         setIconImage(new ImageIcon(getClass().getResource("/Images/mainicon.png")).getImage());
         SimulatorInit();
-        
 
         Model = new DefaultTreeModel(new DefaultMutableTreeNode("root"));
         this.FilesTree.setModel(Model);
@@ -199,7 +198,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
         UpdateButton.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         UpdateButton.setForeground(new java.awt.Color(255, 255, 255));
         UpdateButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/design.png"))); // NOI18N
-        UpdateButton.setText("Actualizar");
+        UpdateButton.setText("Modificar");
         UpdateButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         UpdateButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         UpdateButton.setIconTextGap(10);
@@ -288,7 +287,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
         jPanel1.add(ComboBoxCreateSelection);
-        ComboBoxCreateSelection.setBounds(290, 280, 88, 22);
+        ComboBoxCreateSelection.setBounds(290, 280, 86, 22);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -378,7 +377,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
         jPanel1.add(ComboBoxUserMode);
-        ComboBoxUserMode.setBounds(30, 490, 153, 30);
+        ComboBoxUserMode.setBounds(30, 490, 154, 30);
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel9.setText("Modos de usuario:");
@@ -407,7 +406,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
         GuardarCambios.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         GuardarCambios.setForeground(new java.awt.Color(255, 255, 255));
         GuardarCambios.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/forward.png"))); // NOI18N
-        GuardarCambios.setText("Guardar");
+        GuardarCambios.setText("Actualizar");
         GuardarCambios.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         GuardarCambios.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         GuardarCambios.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -471,9 +470,9 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jPanel3.revalidate();
     }
 
-    
     // SE DEBE VER CUANDO EXPLOTE
     private void PanelBlocksUpdate(String fileName) {
+
         Node<Block> currentBlock = app.getSDApp().getBlocksList().first();
         int index = 0;
 
@@ -481,16 +480,49 @@ public class SimulatorFrame extends javax.swing.JFrame {
             DefaultListModel<String> model = listModels.get(index);
 
             // this.jLists.get(index).setCellRenderer(new ColorRenderer()); // EN ETAPA DE PRUEBAS.
-            
             // SE MODIFICA LA SEGUNDA STRING DEL MODEL
             if (currentBlock.gettInfo().isState() && model.get(1).equals("Libre")) {
                 model.set(1, fileName);
-            } else if (model.get(1).equals("Libre")){
+            } else if (model.get(1).equals("Libre")) {
                 model.set(1, "Libre");
             }
             currentBlock = currentBlock.getpNext();
             index++;
         }
+    }
+
+    private void PanelBlockUpdateSpecificFile(File FileSelected) {
+
+        // BLOQUES DEL ARCHIVO
+        List<Block> ListBlocksFile = FileSelected.getBlocksList();
+
+        // PRIMER BLOQUE DEL ARCHIVO
+        Node<Block> currentBlockNode = ListBlocksFile.first();
+
+    
+        while (currentBlockNode != null) {
+            
+            int blockId = currentBlockNode.gettInfo().getId();
+
+            for (int i = 0; i < listModels.size(); i++) {
+                
+                DefaultListModel<String> model = listModels.get(i);
+               
+                int modelBlockId = Integer.parseInt(model.get(0).substring(7));
+
+                
+                if (blockId == modelBlockId) {
+                    
+                    model.set(1, FileSelected.getFileName());
+                    break;  
+                }
+            }
+            
+            currentBlockNode = currentBlockNode.getpNext();
+        }
+        
+        this.FilesTree.revalidate();
+        this.FilesTree.repaint();
     }
 
     private void SimulatorInit() {
@@ -510,6 +542,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
         GuardarCambios.setVisible(false);
     }
 
+    // PARA PINTAR EL JTREE
     private void configurarTreeRenderer() {
         ImageIcon fileIcon = new ImageIcon(getClass().getResource("../Images/file2.png"));
         ImageIcon directoryIcon = new ImageIcon(getClass().getResource("../Images/directory.png"));
@@ -582,18 +615,18 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
     private boolean VerifyFile(String FileName) {
         if (this.SelectedNode != null) {
-            
+
             Enumeration<TreeNode> children = this.SelectedNode.children();
             while (children.hasMoreElements()) {
                 DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
-                
+
                 String nodeName = child.getUserObject().toString();
-                
+
                 if (nodeName.contains(" [")) {
                     nodeName = nodeName.substring(0, nodeName.indexOf(" [")).trim();
                 }
                 if (nodeName.equalsIgnoreCase(FileName)) {
-                    return true; 
+                    return true;
                 }
             }
         }
@@ -602,25 +635,26 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
     private boolean VerifyDirectory(String directoryName) {
         if (this.SelectedNode != null) {
-            
+
             Enumeration<TreeNode> children = this.SelectedNode.children();
             while (children.hasMoreElements()) {
-                
+
                 DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
                 String label = child.getUserObject().toString();
-                
+
                 if (label.contains(" [D]")) {
-                    
+
                     String nodeName = label.substring(0, label.indexOf(" [D]")).trim();
                     if (nodeName.equalsIgnoreCase(directoryName)) {
-                        return true; 
+                        return true;
                     }
                 }
             }
         }
         return false;
     }
-    
+
+    // PUEDO MODIFICAR
     private void updateAssignmentTable() {
 
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
@@ -706,6 +740,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
                 return;
             }
 
+            // CREACION DEL NUEVO ARCHIVO
             File newFile = new File(nameInput, blockSize, null, null, null);
 
             boolean accessToSD = app.getFileSystemApp().searchAndSet(newFile.getBlockSize(), newFile);
@@ -717,13 +752,21 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
             System.out.println("El archivo ha sido colocado en la SD");
 
-            // Crear el nodo del árbol; 'false' indica que no permite hijos (archivo)
-            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newFile.getFileName() + " [A]", false);
+            // Crear el nodo del árbol; 'false' indica que no permite hijos (archivo)  
+            // CAMBIAR EL TIPO DE DATO QUE SE VA A GUARDAR COMO UN OBJETO.
+            //DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newFile.getFileName() + " [A]", false);
+            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newFile, false);
+
+            System.out.println("Clase del nodo creado" + newNode.getUserObject().getClass());
+            // FINO ES FILE
 
             try {
 
                 DefaultTreeModel model = (DefaultTreeModel) this.FilesTree.getModel();
                 model.insertNodeInto(newNode, this.SelectedNode, this.SelectedNode.getChildCount());
+
+                // TODO BIEN
+                System.out.println("Clase del nodo creado en el arbol " + newNode.getUserObject().getClass());
 
                 // Agregar el archivo a la lista del sistema
                 app.getFileSystemApp().getAssignTableSystem().getListFiles().append(newFile);
@@ -822,58 +865,57 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
     private void CreateButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CreateButtonMouseExited
         // TODO add your handling code here:
-        CreateButton.setBackground(new Color(0,153,102));
+        CreateButton.setBackground(new Color(0, 153, 102));
     }//GEN-LAST:event_CreateButtonMouseExited
 
     private void CreateButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CreateButtonMouseEntered
         // TODO add your handling code here:
-        CreateButton.setBackground(new Color(0,102,51));
+        CreateButton.setBackground(new Color(0, 102, 51));
     }//GEN-LAST:event_CreateButtonMouseEntered
 
     private void DeleteButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DeleteButtonMouseEntered
         // TODO add your handling code here:
-        DeleteButton.setBackground(new Color(255,51,0));
+        DeleteButton.setBackground(new Color(255, 51, 0));
     }//GEN-LAST:event_DeleteButtonMouseEntered
 
     private void DeleteButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DeleteButtonMouseExited
         // TODO add your handling code here:
-        DeleteButton.setBackground(new Color(255,102,102));
+        DeleteButton.setBackground(new Color(255, 102, 102));
     }//GEN-LAST:event_DeleteButtonMouseExited
 
     private void SaveJSONButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SaveJSONButtonMouseEntered
         // TODO add your handling code here:
-        SaveJSONButton.setBackground(new Color(51,51,51));
+        SaveJSONButton.setBackground(new Color(51, 51, 51));
     }//GEN-LAST:event_SaveJSONButtonMouseEntered
 
     private void SaveJSONButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SaveJSONButtonMouseExited
         // TODO add your handling code here:
-        SaveJSONButton.setBackground(new Color(102,102,102));
+        SaveJSONButton.setBackground(new Color(102, 102, 102));
     }//GEN-LAST:event_SaveJSONButtonMouseExited
 
     private void UpdateButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_UpdateButtonMouseEntered
         // TODO add your handling code here:
-        UpdateButton.setBackground(new Color(0,102,255));
+        UpdateButton.setBackground(new Color(0, 102, 255));
     }//GEN-LAST:event_UpdateButtonMouseEntered
 
     private void UpdateButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_UpdateButtonMouseExited
         // TODO add your handling code here:
-        UpdateButton.setBackground(new Color(51,153,255));
+        UpdateButton.setBackground(new Color(51, 153, 255));
     }//GEN-LAST:event_UpdateButtonMouseExited
 
     private void GuardarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarMouseEntered
         // TODO add your handling code here:
-        Guardar.setBackground(new Color(0,51,51));
+        Guardar.setBackground(new Color(0, 51, 51));
     }//GEN-LAST:event_GuardarMouseEntered
 
     private void GuardarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarMouseExited
         // TODO add your handling code here:
-        Guardar.setBackground(new Color(0,102,102));
+        Guardar.setBackground(new Color(0, 102, 102));
     }//GEN-LAST:event_GuardarMouseExited
 
     private void UpdateButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_UpdateButtonMouseClicked
         // MODIFICAR EL NOMBRE DE UN ARCHIVO O DIRECTORIO
-        
-        
+
         jLabel5.setVisible(false);
         jSlider1.setVisible(false);
         SliderValueLabel.setVisible(false);
@@ -883,8 +925,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
         Guardar.setVisible(false);
         jLabel1.setVisible(false);
         GuardarCambios.setVisible(false);
-            
-            
+
         // Verificar que se haya seleccionado un nodo en el árbol
         if (this.SelectedNode == null) {
             JOptionPane.showMessageDialog(null, "Seleccione una carpeta o archivo para cambiar su nombre", "Error", JOptionPane.ERROR_MESSAGE);
@@ -893,43 +934,58 @@ public class SimulatorFrame extends javax.swing.JFrame {
         //Pedir el nombre
         jTextField1.setVisible(true);
         String createName = jLabel5.getText();
-        
+
         jLabel5.setText("Nombre nuevo");
         jLabel5.setVisible(true);
         GuardarCambios.setVisible(true);
-        
-       
+
+
     }//GEN-LAST:event_UpdateButtonMouseClicked
 
     private void GuardarCambiosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarCambiosMouseClicked
-        //Lógica del cambio de nombre
-        String currentSelectedNodeLabel = this.SelectedNode.getUserObject().toString(); //Nombre actual con [A] o [D]
-        String newNameInput = jTextField1.getText().trim(); // Nuevo nombre
-        
-        //Cambiar nombre en el JTree
-        if (currentSelectedNodeLabel.contains(" [A]")) {
-            this.SelectedNode.setUserObject(newNameInput + " [A]");
-        }else {
-            this.SelectedNode.setUserObject(newNameInput + " [D]");
+
+        String newNameInput = jTextField1.getText().trim();
+
+        File SelectedNodeAuxJtree = (File) this.SelectedNode.getUserObject();
+
+        // LOGICA PARA ACTUALIZAR EN EL SD Y ASSIGN 
+        // PROBLEMAS, EL NODO ES INSTANCIA DE STRING
+        System.out.println("Nodo seleccionado LUEGO DE HACER EL CAMBIO EN JTREE" + this.SelectedNode.getUserObject().getClass());
+
+        this.SelectedNode.setUserObject(SelectedNodeAuxJtree);
+
+        if (this.SelectedNode.getUserObject() instanceof File) {
+
+            System.out.println("Obtenemos el archivo");
+
+            File SelectedFile = (File) this.SelectedNode.getUserObject();
+            SelectedFile.setFileName(newNameInput);
+            this.SelectedNode.setUserObject(SelectedFile);
+
+            this.FilesTree.revalidate();
+            this.FilesTree.repaint();
+
+            updateAssignmentTable();
+
+            PanelBlockUpdateSpecificFile(SelectedFile);
+
         }
-        
-        
-        //Cambiar nombre en el JTable
-            //Aquí estoy pensando cómo hacer para editar nada más ese archivo y no uno que se llame igual pero esté en otra ruta.
-        
-        //Cambiar nombre en el SD
-            //Mismo tema
-            
-        //Mensaje de confirmación.
+
+        System.out.println(app.getFileSystemApp().getAssignTableSystem().getListFiles().travel2());
+        System.out.println("\n");
+        System.out.println(app.getSDApp().getBlocksList().travel2());
+
         JOptionPane.showMessageDialog(null, "Nombre cambiado exitosamente");
+
+
     }//GEN-LAST:event_GuardarCambiosMouseClicked
 
     private void GuardarCambiosMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarCambiosMouseEntered
-        GuardarCambios.setBackground(new Color(0,51,51));
+        GuardarCambios.setBackground(new Color(0, 51, 51));
     }//GEN-LAST:event_GuardarCambiosMouseEntered
 
     private void GuardarCambiosMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarCambiosMouseExited
-        GuardarCambios.setBackground(new Color(0,102,102));
+        GuardarCambios.setBackground(new Color(0, 102, 102));
     }//GEN-LAST:event_GuardarCambiosMouseExited
 
     private void GuardarCambiosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GuardarCambiosActionPerformed
@@ -1000,19 +1056,19 @@ public class SimulatorFrame extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 
-    
     class BGPane extends JPanel {
+
         private Image imagen;
 
         @Override
         public void paint(Graphics g) {
             imagen = new ImageIcon(getClass().getResource("../Images/background.jpg")).getImage();
             g.drawImage(imagen, 0, 0, getWidth(), getHeight(), this);
-            
+
             setOpaque(false);
-            
+
             super.paint(g);
         }
     }
-    
+
 }
