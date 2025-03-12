@@ -7,6 +7,9 @@ package MainPackage;
 import AuxClass.List;
 import AuxClass.Node;
 import MainClasses.App;
+import java.util.Enumeration;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 /**
  *
@@ -72,5 +75,44 @@ public class FileSystem {
     public void setAssignTableSystem(AssignTable AssignTableSystem) {
         this.AssignTableSystem = AssignTableSystem;
     }
+    
+    
+      // Método para obtener todos los archivos a partir de un nodo dado
+    public static List<DefaultMutableTreeNode> getAllFilesFromNode(DefaultMutableTreeNode node) {
+        List<DefaultMutableTreeNode> fileList = new List<>("Lista de Archivos");
+
+        // Llamar al método recursivo para llenar la lista
+        collectFiles(node, fileList);
+        
+        return fileList;
+    }
+
+    // Método recursivo para recolectar archivos
+    private static void collectFiles(DefaultMutableTreeNode node, List<DefaultMutableTreeNode> fileList) {
+        // Verificar si el nodo tiene hijos
+        Enumeration<TreeNode> children = node.children();
+        
+        while (children.hasMoreElements()) {
+            TreeNode childNode = children.nextElement();
+
+            // Hacer un casting a DefaultMutableTreeNode
+            if (childNode instanceof DefaultMutableTreeNode) {
+                DefaultMutableTreeNode defaultChildNode = (DefaultMutableTreeNode) childNode;
+
+                // Obtener el objeto del usuario del nodo
+                Object userObject = defaultChildNode.getUserObject();
+
+                // Verificar si es una instancia de File
+                if (userObject instanceof File) {
+                    // Agregar a la lista
+                    fileList.append(defaultChildNode);
+                }
+
+                // Llamar recursivamente para los hijos del nodo actual
+                collectFiles(defaultChildNode, fileList);
+            }
+        }
+    }
+
 
 }

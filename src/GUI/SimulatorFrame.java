@@ -287,7 +287,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
         jPanel1.add(ComboBoxCreateSelection);
-        ComboBoxCreateSelection.setBounds(290, 280, 86, 22);
+        ComboBoxCreateSelection.setBounds(290, 280, 88, 22);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -354,6 +354,9 @@ public class SimulatorFrame extends javax.swing.JFrame {
         DeleteButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         DeleteButton.setIconTextGap(10);
         DeleteButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                DeleteButtonMouseClicked(evt);
+            }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 DeleteButtonMouseEntered(evt);
             }
@@ -377,7 +380,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
         jPanel1.add(ComboBoxUserMode);
-        ComboBoxUserMode.setBounds(30, 490, 154, 30);
+        ComboBoxUserMode.setBounds(30, 490, 153, 30);
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel9.setText("Modos de usuario:");
@@ -491,7 +494,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
         }
     }
 
-    private void PanelBlockUpdateSpecificFile(File FileSelected) {
+    private void PanelBlockUpdateSpecificFile(File FileSelected, boolean del) {
 
         // BLOQUES DEL ARCHIVO
         List<Block> ListBlocksFile = FileSelected.getBlocksList();
@@ -512,8 +515,12 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
                 
                 if (blockId == modelBlockId) {
-                    
-                    model.set(1, FileSelected.getFileName());
+                    if (del){
+                        model.set(1, "Libre");
+                        currentBlockNode.gettInfo().setState(!currentBlockNode.gettInfo().isState());
+                    }else{
+                        model.set(1, FileSelected.getFileName());
+                    }
                     break;  
                 }
             }
@@ -967,7 +974,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
             updateAssignmentTable();
 
-            PanelBlockUpdateSpecificFile(SelectedFile);
+            PanelBlockUpdateSpecificFile(SelectedFile, false);
 
         }
 
@@ -992,6 +999,105 @@ public class SimulatorFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_GuardarCambiosActionPerformed
 
+    private void DeleteButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DeleteButtonMouseClicked
+        // Lógica para borrar un directorio o archivo:
+        jLabel5.setVisible(false);
+        jSlider1.setVisible(false);
+        SliderValueLabel.setVisible(false);
+        jLabel6.setVisible(false);
+        ComboBoxCreateSelection.setVisible(false);
+        jTextField1.setVisible(false);
+        Guardar.setVisible(false);
+        jLabel1.setVisible(false);
+        GuardarCambios.setVisible(false);
+
+        // Verificar que se haya seleccionado un nodo en el árbol
+        if (this.SelectedNode == null) {
+            JOptionPane.showMessageDialog(null, "Seleccione una carpeta o archivo para eliminar", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Obtener el nombre del archivo/directorio para la confirmación
+        String nombre = this.SelectedNode.getUserObject().toString(); // Ajusta esto según tu estructura de nodos
+
+        // Mostrar diálogo de confirmación
+        int confirm = JOptionPane.showConfirmDialog(null, 
+            "¿Está seguro que desea borrar \"" + nombre + "\"? Esta acción no se puede deshacer.", 
+            "Confirmación de eliminación", 
+            JOptionPane.YES_NO_OPTION, 
+            JOptionPane.WARNING_MESSAGE);
+
+        // Verificar la respuesta del usuario
+        if (confirm == JOptionPane.YES_OPTION) {
+            // Aquí va la lógica para borrar el archivo/directorio
+            System.out.println("A BORRARRRRR");
+            
+            if (this.SelectedNode.getUserObject() instanceof File) {
+                File selectedFile = (File) SelectedNode.getUserObject();
+                removeFromAssignmentTable(selectedFile);
+                PanelBlockUpdateSpecificFile(selectedFile, true);
+                System.out.println("Obtenemos el archivo");
+                this.SelectedNode.removeFromParent(); // Eliminar nodo
+                ((DefaultTreeModel) this.FilesTree.getModel()).reload(); // Recargar el modelo del árbol
+                this.FilesTree.revalidate(); // Actualizar el árbol
+                this.FilesTree.repaint(); // Redibujar el árbol
+                this.FilesTree.revalidate();
+                this.FilesTree.repaint();
+
+            }else {
+                System.out.println("Obtenemos el directorio");
+                List<DefaultMutableTreeNode> FilesNodes = app.getFileSystemApp().getAllFilesFromNode(this.SelectedNode);
+                System.out.println("esta vacía??? " + FilesNodes.isEmpty());
+                System.out.println(FilesNodes.travel());
+                if (FilesNodes.isEmpty()) {
+                    System.out.println("No tiene hijos este nodo");
+                    // La lista está vacía
+                }else{
+                    Node<DefaultMutableTreeNode> current = FilesNodes.getpFirst();
+                    while (current != null) {
+                        File selectedFile = (File) current.gettInfo().getUserObject();
+                        System.out.println(selectedFile + "es el arvhivito");
+                        removeFromAssignmentTable(selectedFile);
+                        PanelBlockUpdateSpecificFile(selectedFile, true);
+                        current = current.getpNext();
+                    }
+                }
+                this.SelectedNode.removeFromParent(); // Eliminar nodo
+                ((DefaultTreeModel) this.FilesTree.getModel()).reload(); // Recargar el modelo del árbol
+                this.FilesTree.revalidate(); // Actualizar el árbol
+                this.FilesTree.repaint(); // Redibujar el árbol
+                // si es un directorio...
+            }
+            
+        } else {
+            // Si el usuario cancela, simplemente salimos de la función
+            return;
+        }
+        
+    }//GEN-LAST:event_DeleteButtonMouseClicked
+
+    public void deleteFile(){
+        
+    
+    }
+    
+    private void removeFromAssignmentTable(File selectedFile) {
+        // Obtener la lista de archivos asignados
+        List<File> assignedFiles = app.getFileSystemApp().getAssignTableSystem().getListFiles();
+
+        // Intentar eliminar el archivo seleccionado de la lista
+        boolean removed = assignedFiles.remove(selectedFile);
+
+        if (removed) {
+            System.out.println("Archivo eliminado de la tabla de asignaciones: " + selectedFile.getFileName());
+        } else {
+            System.out.println("El archivo no se encontró en la tabla de asignaciones.");
+        }
+
+        // Actualizar la tabla de asignaciones
+        updateAssignmentTable();
+    }
+    
     /**
      * @param args the command line arguments
      */
