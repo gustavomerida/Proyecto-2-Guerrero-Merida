@@ -37,7 +37,7 @@ public class AssignTable {
         return sb;
         
     }
-
+    
     public List<File> getListFiles() {
         return ListFiles;
     }
