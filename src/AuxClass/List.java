@@ -85,6 +85,9 @@ public class List<T> {
         iN++;
     }
 
+    public Node<T> getpFirst(){
+        return this.pFirst;
+    }
     public String travel() {
         Node<T> pAux;
         String result = "";
@@ -150,5 +153,34 @@ public class List<T> {
             }
             return pAux;
         }
+    }
+    public boolean remove(T elem) {
+        
+        if (this.isEmpty()) {
+            return false; // La lista está vacía
+        }
+
+        // Si el primer nodo es el que se quiere eliminar
+        
+        if (this.pFirst.gettInfo().equals(elem)) {
+            System.out.println("Era el primero");
+            this.pFirst = this.pFirst.getpNext(); // Cambiar el primer nodo
+            iN--;
+            return true;
+        }
+
+        Node<T> current = this.pFirst;
+        while (current.getpNext() != null) {
+            System.out.println("¿Son igualessss?" + current.getpNext().gettInfo().equals(elem));
+            if (current.getpNext().gettInfo().equals(elem)) {
+                System.out.println("si soon");
+                current.setpNext(current.getpNext().getpNext()); // Eliminar el nodo
+                iN--;
+                return true;
+            }
+            current = current.getpNext();
+        }
+
+        return false; // No se encontró el elemento
     }
 }
