@@ -109,6 +109,8 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         SaveJSONButton = new javax.swing.JButton();
         GuardarCambios = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        logTextArea = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -287,7 +289,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
         jPanel1.add(ComboBoxCreateSelection);
-        ComboBoxCreateSelection.setBounds(290, 280, 88, 22);
+        ComboBoxCreateSelection.setBounds(290, 280, 86, 22);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -431,6 +433,14 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jPanel1.add(GuardarCambios);
         GuardarCambios.setBounds(180, 430, 90, 26);
 
+        logTextArea.setEditable(false);
+        logTextArea.setColumns(20);
+        logTextArea.setRows(5);
+        jScrollPane1.setViewportView(logTextArea);
+
+        jPanel1.add(jScrollPane1);
+        jScrollPane1.setBounds(200, 480, 280, 86);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -502,32 +512,30 @@ public class SimulatorFrame extends javax.swing.JFrame {
         // PRIMER BLOQUE DEL ARCHIVO
         Node<Block> currentBlockNode = ListBlocksFile.first();
 
-    
         while (currentBlockNode != null) {
-            
+
             int blockId = currentBlockNode.gettInfo().getId();
 
             for (int i = 0; i < listModels.size(); i++) {
-                
+
                 DefaultListModel<String> model = listModels.get(i);
-               
+
                 int modelBlockId = Integer.parseInt(model.get(0).substring(7));
 
-                
                 if (blockId == modelBlockId) {
-                    if (del){
+                    if (del) {
                         model.set(1, "Libre");
                         currentBlockNode.gettInfo().setState(!currentBlockNode.gettInfo().isState());
-                    }else{
+                    } else {
                         model.set(1, FileSelected.getFileName());
                     }
-                    break;  
+                    break;
                 }
             }
-            
+
             currentBlockNode = currentBlockNode.getpNext();
         }
-        
+
         this.FilesTree.revalidate();
         this.FilesTree.repaint();
     }
@@ -712,6 +720,13 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
     }//GEN-LAST:event_CreateButtonActionPerformed
 
+    private void UpdateLogArea(String Info) {
+        this.logTextArea.append(Info);
+        this.FilesTree.revalidate();
+        this.FilesTree.repaint();
+    }
+
+
     private void GuardarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarMouseClicked
 
         // CREACION DE ARCHIVOS Y DIRECTORIOS
@@ -763,6 +778,10 @@ public class SimulatorFrame extends javax.swing.JFrame {
             // CAMBIAR EL TIPO DE DATO QUE SE VA A GUARDAR COMO UN OBJETO.
             //DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newFile.getFileName() + " [A]", false);
             DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newFile, false);
+            
+            // LOGICA PARA EL LOG
+            String InfoLogArea = app.getFileSystemApp().ShowDate(newNode, "Archivo", "creado");
+            UpdateLogArea(InfoLogArea);
 
             System.out.println("Clase del nodo creado" + newNode.getUserObject().getClass());
             // FINO ES FILE
@@ -801,6 +820,11 @@ public class SimulatorFrame extends javax.swing.JFrame {
             Directory newDirectory = new Directory(nameInput, null, null);
 
             DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newDirectory.getDirectoryName() + " [D]", true);
+//            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newDirectory + " [D]", true);
+
+            // LOGICA PARA EL LOG
+            String InfoLogArea = app.getFileSystemApp().ShowDate(newNode, "Directorio", "creado");
+            UpdateLogArea(InfoLogArea);
 
             try {
 
@@ -959,14 +983,16 @@ public class SimulatorFrame extends javax.swing.JFrame {
         // PROBLEMAS, EL NODO ES INSTANCIA DE STRING
         System.out.println("Nodo seleccionado LUEGO DE HACER EL CAMBIO EN JTREE" + this.SelectedNode.getUserObject().getClass());
 
-        this.SelectedNode.setUserObject(SelectedNodeAuxJtree);
-
+//        this.SelectedNode.setUserObject(SelectedNodeAuxJtree);
         if (this.SelectedNode.getUserObject() instanceof File) {
 
             System.out.println("Obtenemos el archivo");
 
             File SelectedFile = (File) this.SelectedNode.getUserObject();
             SelectedFile.setFileName(newNameInput);
+            String Info = app.getFileSystemApp().ShowDate(this.SelectedNode, "Archivo", "modificado");
+            UpdateLogArea(Info);
+
             this.SelectedNode.setUserObject(SelectedFile);
 
             this.FilesTree.revalidate();
@@ -1016,24 +1042,28 @@ public class SimulatorFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Seleccione una carpeta o archivo para eliminar", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         // Obtener el nombre del archivo/directorio para la confirmación
         String nombre = this.SelectedNode.getUserObject().toString(); // Ajusta esto según tu estructura de nodos
 
         // Mostrar diálogo de confirmación
-        int confirm = JOptionPane.showConfirmDialog(null, 
-            "¿Está seguro que desea borrar \"" + nombre + "\"? Esta acción no se puede deshacer.", 
-            "Confirmación de eliminación", 
-            JOptionPane.YES_NO_OPTION, 
-            JOptionPane.WARNING_MESSAGE);
+        int confirm = JOptionPane.showConfirmDialog(null,
+                "¿Está seguro que desea borrar \"" + nombre + "\"? Esta acción no se puede deshacer.",
+                "Confirmación de eliminación",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
 
         // Verificar la respuesta del usuario
         if (confirm == JOptionPane.YES_OPTION) {
             // Aquí va la lógica para borrar el archivo/directorio
             System.out.println("A BORRARRRRR");
-            
-            if (this.SelectedNode.getUserObject() instanceof File) {
+
+            if (this.SelectedNode.getUserObject() instanceof File) {                
                 File selectedFile = (File) SelectedNode.getUserObject();
+                
+                String Info = app.getFileSystemApp().ShowDate(SelectedNode, "Archivo", "borrado");
+                UpdateLogArea(Info);
+                
                 removeFromAssignmentTable(selectedFile);
                 PanelBlockUpdateSpecificFile(selectedFile, true);
                 System.out.println("Obtenemos el archivo");
@@ -1043,16 +1073,23 @@ public class SimulatorFrame extends javax.swing.JFrame {
                 this.FilesTree.repaint(); // Redibujar el árbol
                 this.FilesTree.revalidate();
                 this.FilesTree.repaint();
+                
+                
 
-            }else {
+            } else {
                 System.out.println("Obtenemos el directorio");
                 List<DefaultMutableTreeNode> FilesNodes = app.getFileSystemApp().getAllFilesFromNode(this.SelectedNode);
                 System.out.println("esta vacía??? " + FilesNodes.isEmpty());
                 System.out.println(FilesNodes.travel());
+                
+                // LOGICA DEL LOG
+                String Info = app.getFileSystemApp().ShowDate(SelectedNode, "Directorio", "borrado");
+                UpdateLogArea(Info);
+                
                 if (FilesNodes.isEmpty()) {
                     System.out.println("No tiene hijos este nodo");
                     // La lista está vacía
-                }else{
+                } else {
                     Node<DefaultMutableTreeNode> current = FilesNodes.getpFirst();
                     while (current != null) {
                         File selectedFile = (File) current.gettInfo().getUserObject();
@@ -1068,19 +1105,18 @@ public class SimulatorFrame extends javax.swing.JFrame {
                 this.FilesTree.repaint(); // Redibujar el árbol
                 // si es un directorio...
             }
-            
+
         } else {
             // Si el usuario cancela, simplemente salimos de la función
             return;
         }
-        
+
     }//GEN-LAST:event_DeleteButtonMouseClicked
 
-    public void deleteFile(){
-        
-    
+    public void deleteFile() {
+
     }
-    
+
     private void removeFromAssignmentTable(File selectedFile) {
         // Obtener la lista de archivos asignados
         List<File> assignedFiles = app.getFileSystemApp().getAssignTableSystem().getListFiles();
@@ -1097,7 +1133,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
         // Actualizar la tabla de asignaciones
         updateAssignmentTable();
     }
-    
+
     /**
      * @param args the command line arguments
      */
@@ -1155,11 +1191,13 @@ public class SimulatorFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSlider jSlider1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextArea logTextArea;
     // End of variables declaration//GEN-END:variables
 
     class BGPane extends JPanel {
