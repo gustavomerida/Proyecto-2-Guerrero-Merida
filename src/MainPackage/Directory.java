@@ -21,10 +21,10 @@ public class Directory {
         this.SubDirectoriesList = SubDirectoriesList;
     }
 
-//    @Override
-//    public String toString(){
-//        return DirectoryName;
-//    }
+    @Override
+    public String toString(){
+        return DirectoryName + " [D]";
+    }
     
     
     /**
