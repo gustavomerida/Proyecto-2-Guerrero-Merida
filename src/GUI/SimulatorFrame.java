@@ -793,7 +793,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
             // CAMBIAR EL TIPO DE DATO QUE SE VA A GUARDAR COMO UN OBJETO.
             //DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newFile.getFileName() + " [A]", false);
             DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newFile, false);
-            
+
             // LOGICA PARA EL LOG
             String InfoLogArea = app.getFileSystemApp().ShowDate(newNode, "Archivo", "creado");
             UpdateLogArea(InfoLogArea);
@@ -992,17 +992,28 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
         String newNameInput = jTextField1.getText().trim();
 
-        //File SelectedNodeAuxJtree = (File) this.SelectedNode.getUserObject();
+
+        // Validar si el nombre está vacío
+        if (newNameInput.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "El nombre no puede estar vacío.");
+            return;
+        }
+
+        // Verificar si el nombre ya existe en la misma carpeta o nodo padre
+        if (VerifyFileAtModify(newNameInput)) {
+            JOptionPane.showMessageDialog(null, "Ya existe un archivo o directorio con ese nombre en la misma ubicación.");
+            return;
+        }
+
+        File SelectedNodeAuxJtree = (File) this.SelectedNode.getUserObject();
+
 
         // LOGICA PARA ACTUALIZAR EN EL SD Y ASSIGN 
-        // PROBLEMAS, EL NODO ES INSTANCIA DE STRING
-        System.out.println("Nodo seleccionado LUEGO DE HACER EL CAMBIO EN JTREE" + this.SelectedNode.getUserObject().getClass());
+        System.out.println("Nodo seleccionado LUEGO DE HACER EL CAMBIO EN JTREE: " + this.SelectedNode.getUserObject().getClass());
 
-//        this.SelectedNode.setUserObject(SelectedNodeAuxJtree);
         if (this.SelectedNode.getUserObject() instanceof File) {
 
             System.out.println("Obtenemos el archivo");
-
             File SelectedFile = (File) this.SelectedNode.getUserObject();
             //buscar en la lista de files por id del primer bloque
             List<File> ListFiles = app.getFileSystemApp().getAssignTableSystem().getListFiles();
@@ -1027,9 +1038,10 @@ public class SimulatorFrame extends javax.swing.JFrame {
             this.FilesTree.repaint();
 
             updateAssignmentTable();
-
             PanelBlockUpdateSpecificFile(SelectedFile, false);
 
+
+            JOptionPane.showMessageDialog(null, "Nombre cambiado exitosamente");
         }else{
             Directory SelectedDir = (Directory) this.SelectedNode.getUserObject();
             SelectedDir.setDirectoryName(newNameInput);
@@ -1040,18 +1052,39 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
             this.FilesTree.revalidate();
             this.FilesTree.repaint();
+
         }
         
         
 
-        System.out.println(app.getFileSystemApp().getAssignTableSystem().getListFiles().travel2());
-        System.out.println("\n");
-        System.out.println(app.getSDApp().getBlocksList().travel2());
-
-        JOptionPane.showMessageDialog(null, "Nombre cambiado exitosamente");
-
 
     }//GEN-LAST:event_GuardarCambiosMouseClicked
+
+    private boolean VerifyFileAtModify(String FileName) {
+        if (this.SelectedNode != null) {
+            // Obtener el nodo padre para evaluar los nombres de los hijos
+            DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) this.SelectedNode.getParent();
+            if (parentNode != null) {
+                Enumeration<TreeNode> children = parentNode.children();
+                while (children.hasMoreElements()) {
+                    DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
+                    String nodeName = child.getUserObject().toString();
+
+                    // Eliminar sufijo "[D]" en caso de ser un directorio
+                    if (nodeName.contains(" [")) {
+                        nodeName = nodeName.substring(0, nodeName.indexOf(" [")).trim();
+                    }
+
+                    // Comparar el nombre del archivo ignorando mayúsculas/minúsculas
+                    if (nodeName.equalsIgnoreCase(FileName)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
 
     private void GuardarCambiosMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarCambiosMouseEntered
         GuardarCambios.setBackground(new Color(0, 51, 51));
@@ -1098,8 +1131,9 @@ public class SimulatorFrame extends javax.swing.JFrame {
             // Aquí va la lógica para borrar el archivo/directorio
             System.out.println("A BORRARRRRR");
 
-            if (this.SelectedNode.getUserObject() instanceof File) {                
+            if (this.SelectedNode.getUserObject() instanceof File) {
                 File selectedFile = (File) SelectedNode.getUserObject();
+
                 List<File> ListFiles = app.getFileSystemApp().getAssignTableSystem().getListFiles();
                 Node<File> listedNode = ListFiles.getpFirst();
                 while (listedNode!=null){
@@ -1112,10 +1146,10 @@ public class SimulatorFrame extends javax.swing.JFrame {
                     }
                     listedNode = listedNode.getpNext();
                 }
-                
+
                 String Info = app.getFileSystemApp().ShowDate(SelectedNode, "Archivo", "borrado");
                 UpdateLogArea(Info);
-                
+
                 removeFromAssignmentTable(selectedFile);
                 PanelBlockUpdateSpecificFile(selectedFile, true);
                 System.out.println("Obtenemos el archivo");
@@ -1125,19 +1159,17 @@ public class SimulatorFrame extends javax.swing.JFrame {
                 this.FilesTree.repaint(); // Redibujar el árbol
                 this.FilesTree.revalidate();
                 this.FilesTree.repaint();
-                
-                
 
             } else {
                 System.out.println("Obtenemos el directorio");
                 List<DefaultMutableTreeNode> FilesNodes = app.getFileSystemApp().getAllFilesFromNode(this.SelectedNode);
                 System.out.println("esta vacía??? " + FilesNodes.isEmpty());
                 System.out.println(FilesNodes.travel());
-                
+
                 // LOGICA DEL LOG
                 String Info = app.getFileSystemApp().ShowDate(SelectedNode, "Directorio", "borrado");
                 UpdateLogArea(Info);
-                
+
                 if (FilesNodes.isEmpty()) {
                     System.out.println("No tiene hijos este nodo");
                     // La lista está vacía
