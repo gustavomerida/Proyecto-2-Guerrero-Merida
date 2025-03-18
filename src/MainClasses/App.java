@@ -12,6 +12,7 @@ import MainPackage.Block;
 import MainPackage.File;
 import MainPackage.FileSystem;
 import MainPackage.SD;
+import FileFunctions.FileSystemData;
 
 /**
  *
@@ -23,6 +24,7 @@ public class App {
 
     private SD SDApp;
     private FileSystem FileSystemApp;
+    private FileSystemData jsonData;
 
     private App() {
         this.SDApp = SDInit();
@@ -94,6 +96,7 @@ public class App {
 //        testSearchAndSet();
     }
 
+    
     public SD getSDApp() {
         return SDApp;
     }
@@ -108,6 +111,16 @@ public class App {
 
     public void setFileSystemApp(FileSystem FileSystemApp) {
         this.FileSystemApp = FileSystemApp;
+    }
+
+    /**
+     * @return the jsonData
+     */
+    public FileSystemData getJsonData() {
+        if (jsonData == null) { // Inicializamos solo cuando sea necesario
+            jsonData = new FileSystemData();
+        }
+        return jsonData;
     }
 
 }

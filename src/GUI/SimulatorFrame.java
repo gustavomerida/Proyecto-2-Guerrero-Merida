@@ -8,16 +8,24 @@ import GUI.ColorRenderer;
 
 import AuxClass.List;
 import AuxClass.Node;
+//import FileFunctions.FileSystemData;
+import FileFunctions.TreeNodeData;
 import MainClasses.App;
 import MainPackage.Block;
 import MainPackage.Directory;
 import MainPackage.File;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Enumeration;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -68,12 +76,15 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
         this.setBounds(0, 0, 986, 618);
         this.setResizable(false);
-
-        configurarTreeRenderer();
+        
         PanelBlocksInit();
+        app.getJsonData().loadJSON(FilesTree, this);
+        configurarTreeRenderer();
+        
 
     }
 
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -109,6 +120,8 @@ public class SimulatorFrame extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         SaveJSONButton = new javax.swing.JButton();
         GuardarCambios = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        logTextArea = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -395,6 +408,9 @@ public class SimulatorFrame extends javax.swing.JFrame {
         SaveJSONButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         SaveJSONButton.setIconTextGap(10);
         SaveJSONButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                SaveJSONButtonMouseClicked(evt);
+            }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 SaveJSONButtonMouseEntered(evt);
             }
@@ -429,7 +445,15 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
         jPanel1.add(GuardarCambios);
-        GuardarCambios.setBounds(180, 430, 90, 26);
+        GuardarCambios.setBounds(160, 430, 110, 26);
+
+        logTextArea.setEditable(false);
+        logTextArea.setColumns(20);
+        logTextArea.setRows(5);
+        jScrollPane1.setViewportView(logTextArea);
+
+        jPanel1.add(jScrollPane1);
+        jScrollPane1.setBounds(200, 480, 280, 86);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -502,32 +526,30 @@ public class SimulatorFrame extends javax.swing.JFrame {
         // PRIMER BLOQUE DEL ARCHIVO
         Node<Block> currentBlockNode = ListBlocksFile.first();
 
-    
         while (currentBlockNode != null) {
-            
+
             int blockId = currentBlockNode.gettInfo().getId();
 
             for (int i = 0; i < listModels.size(); i++) {
-                
+
                 DefaultListModel<String> model = listModels.get(i);
-               
+
                 int modelBlockId = Integer.parseInt(model.get(0).substring(7));
 
-                
                 if (blockId == modelBlockId) {
-                    if (del){
+                    if (del) {
                         model.set(1, "Libre");
                         currentBlockNode.gettInfo().setState(!currentBlockNode.gettInfo().isState());
-                    }else{
+                    } else {
                         model.set(1, FileSelected.getFileName());
                     }
-                    break;  
+                    break;
                 }
             }
-            
+
             currentBlockNode = currentBlockNode.getpNext();
         }
-        
+
         this.FilesTree.revalidate();
         this.FilesTree.repaint();
     }
@@ -670,16 +692,17 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
         int LimitTable = app.getFileSystemApp().getAssignTableSystem().getListFiles().size();
         List<File> ListFiles = app.getFileSystemApp().getAssignTableSystem().getListFiles();
+        if (!ListFiles.isEmpty()){
+            for (int i = 0; i < LimitTable; i++) {
 
-        for (int i = 0; i < LimitTable; i++) {
+                String FileName = ListFiles.get(i).getFileName();
+                int InitialBlock = ListFiles.get(i).getFirstBlock().getId();
+                int Length = ListFiles.get(i).getBlocksList().size();
+                String ListaBloques = ListFiles.get(i).getBlocksList().travel2();
 
-            String FileName = ListFiles.get(i).getFileName();
-            int InitialBlock = ListFiles.get(i).getFirstBlock().getId();
-            int Length = ListFiles.get(i).getBlocksList().size();
-            String ListaBloques = ListFiles.get(i).getBlocksList().travel2();
+                model.addRow(new Object[]{FileName, InitialBlock, Length, ListaBloques});
 
-            model.addRow(new Object[]{FileName, InitialBlock, Length, ListaBloques});
-
+            }
         }
 
     }
@@ -711,6 +734,13 @@ public class SimulatorFrame extends javax.swing.JFrame {
     private void CreateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateButtonActionPerformed
 
     }//GEN-LAST:event_CreateButtonActionPerformed
+
+    private void UpdateLogArea(String Info) {
+        this.logTextArea.append(Info);
+        this.FilesTree.revalidate();
+        this.FilesTree.repaint();
+    }
+
 
     private void GuardarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarMouseClicked
 
@@ -763,6 +793,10 @@ public class SimulatorFrame extends javax.swing.JFrame {
             // CAMBIAR EL TIPO DE DATO QUE SE VA A GUARDAR COMO UN OBJETO.
             //DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newFile.getFileName() + " [A]", false);
             DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newFile, false);
+            
+            // LOGICA PARA EL LOG
+            String InfoLogArea = app.getFileSystemApp().ShowDate(newNode, "Archivo", "creado");
+            UpdateLogArea(InfoLogArea);
 
             System.out.println("Clase del nodo creado" + newNode.getUserObject().getClass());
             // FINO ES FILE
@@ -800,7 +834,12 @@ public class SimulatorFrame extends javax.swing.JFrame {
             // CREO QUE LOS OTROS 2 ATRUBUTOS DE DIRECTORY YA NO SON NECESARIOS GRACIAS A LOS METODOS DEL JTREE
             Directory newDirectory = new Directory(nameInput, null, null);
 
-            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newDirectory.getDirectoryName() + " [D]", true);
+            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newDirectory, true);
+//            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newDirectory + " [D]", true);
+
+            // LOGICA PARA EL LOG
+            String InfoLogArea = app.getFileSystemApp().ShowDate(newNode, "Directorio", "creado");
+            UpdateLogArea(InfoLogArea);
 
             try {
 
@@ -953,20 +992,35 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
         String newNameInput = jTextField1.getText().trim();
 
-        File SelectedNodeAuxJtree = (File) this.SelectedNode.getUserObject();
+        //File SelectedNodeAuxJtree = (File) this.SelectedNode.getUserObject();
 
         // LOGICA PARA ACTUALIZAR EN EL SD Y ASSIGN 
         // PROBLEMAS, EL NODO ES INSTANCIA DE STRING
         System.out.println("Nodo seleccionado LUEGO DE HACER EL CAMBIO EN JTREE" + this.SelectedNode.getUserObject().getClass());
 
-        this.SelectedNode.setUserObject(SelectedNodeAuxJtree);
-
+//        this.SelectedNode.setUserObject(SelectedNodeAuxJtree);
         if (this.SelectedNode.getUserObject() instanceof File) {
 
             System.out.println("Obtenemos el archivo");
 
             File SelectedFile = (File) this.SelectedNode.getUserObject();
+            //buscar en la lista de files por id del primer bloque
+            List<File> ListFiles = app.getFileSystemApp().getAssignTableSystem().getListFiles();
+            Node<File> listedNode = ListFiles.getpFirst();
+            while (listedNode!=null){
+                System.out.println("recorriendo");
+                System.out.println(listedNode.gettInfo().getFirstBlock().getId());
+                System.out.println(SelectedFile.getFirstBlock().getId());
+                if (listedNode.gettInfo().getFirstBlock().getId() == SelectedFile.getFirstBlock().getId()) {
+                    System.out.println("SON IGUALES");
+                    SelectedFile = listedNode.gettInfo();
+                }
+                listedNode = listedNode.getpNext();
+            }
             SelectedFile.setFileName(newNameInput);
+            String Info = app.getFileSystemApp().ShowDate(this.SelectedNode, "Archivo", "modificado");
+            UpdateLogArea(Info);
+
             this.SelectedNode.setUserObject(SelectedFile);
 
             this.FilesTree.revalidate();
@@ -976,7 +1030,19 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
             PanelBlockUpdateSpecificFile(SelectedFile, false);
 
+        }else{
+            Directory SelectedDir = (Directory) this.SelectedNode.getUserObject();
+            SelectedDir.setDirectoryName(newNameInput);
+            String Info = app.getFileSystemApp().ShowDate(this.SelectedNode, "Directorio", "modificado");
+            UpdateLogArea(Info);
+
+            this.SelectedNode.setUserObject(SelectedDir);
+
+            this.FilesTree.revalidate();
+            this.FilesTree.repaint();
         }
+        
+        
 
         System.out.println(app.getFileSystemApp().getAssignTableSystem().getListFiles().travel2());
         System.out.println("\n");
@@ -1016,24 +1082,40 @@ public class SimulatorFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Seleccione una carpeta o archivo para eliminar", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         // Obtener el nombre del archivo/directorio para la confirmación
         String nombre = this.SelectedNode.getUserObject().toString(); // Ajusta esto según tu estructura de nodos
 
         // Mostrar diálogo de confirmación
-        int confirm = JOptionPane.showConfirmDialog(null, 
-            "¿Está seguro que desea borrar \"" + nombre + "\"? Esta acción no se puede deshacer.", 
-            "Confirmación de eliminación", 
-            JOptionPane.YES_NO_OPTION, 
-            JOptionPane.WARNING_MESSAGE);
+        int confirm = JOptionPane.showConfirmDialog(null,
+                "¿Está seguro que desea borrar \"" + nombre + "\"? Esta acción no se puede deshacer.",
+                "Confirmación de eliminación",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
 
         // Verificar la respuesta del usuario
         if (confirm == JOptionPane.YES_OPTION) {
             // Aquí va la lógica para borrar el archivo/directorio
             System.out.println("A BORRARRRRR");
-            
-            if (this.SelectedNode.getUserObject() instanceof File) {
+
+            if (this.SelectedNode.getUserObject() instanceof File) {                
                 File selectedFile = (File) SelectedNode.getUserObject();
+                List<File> ListFiles = app.getFileSystemApp().getAssignTableSystem().getListFiles();
+                Node<File> listedNode = ListFiles.getpFirst();
+                while (listedNode!=null){
+                    System.out.println("recorriendo");
+                    System.out.println(listedNode.gettInfo().getFirstBlock().getId());
+                    System.out.println(selectedFile.getFirstBlock().getId());
+                    if (listedNode.gettInfo().getFirstBlock().getId() == selectedFile.getFirstBlock().getId()) {
+                        System.out.println("SON IGUALES");
+                        selectedFile = listedNode.gettInfo();
+                    }
+                    listedNode = listedNode.getpNext();
+                }
+                
+                String Info = app.getFileSystemApp().ShowDate(SelectedNode, "Archivo", "borrado");
+                UpdateLogArea(Info);
+                
                 removeFromAssignmentTable(selectedFile);
                 PanelBlockUpdateSpecificFile(selectedFile, true);
                 System.out.println("Obtenemos el archivo");
@@ -1043,19 +1125,40 @@ public class SimulatorFrame extends javax.swing.JFrame {
                 this.FilesTree.repaint(); // Redibujar el árbol
                 this.FilesTree.revalidate();
                 this.FilesTree.repaint();
+                
+                
 
-            }else {
+            } else {
                 System.out.println("Obtenemos el directorio");
                 List<DefaultMutableTreeNode> FilesNodes = app.getFileSystemApp().getAllFilesFromNode(this.SelectedNode);
                 System.out.println("esta vacía??? " + FilesNodes.isEmpty());
                 System.out.println(FilesNodes.travel());
+                
+                // LOGICA DEL LOG
+                String Info = app.getFileSystemApp().ShowDate(SelectedNode, "Directorio", "borrado");
+                UpdateLogArea(Info);
+                
                 if (FilesNodes.isEmpty()) {
                     System.out.println("No tiene hijos este nodo");
                     // La lista está vacía
-                }else{
+                } else {
                     Node<DefaultMutableTreeNode> current = FilesNodes.getpFirst();
                     while (current != null) {
                         File selectedFile = (File) current.gettInfo().getUserObject();
+                        
+                        List<File> ListFiles = app.getFileSystemApp().getAssignTableSystem().getListFiles();
+                        Node<File> listedNode = ListFiles.getpFirst();
+                        while (listedNode!=null){
+                            System.out.println("recorriendo");
+                            System.out.println(listedNode.gettInfo().getFirstBlock().getId());
+                            System.out.println(selectedFile.getFirstBlock().getId());
+                            if (listedNode.gettInfo().getFirstBlock().getId() == selectedFile.getFirstBlock().getId()) {
+                                System.out.println("SON IGUALES");
+                                selectedFile = listedNode.gettInfo();
+                            }
+                            listedNode = listedNode.getpNext();
+                        }
+                        
                         System.out.println(selectedFile + "es el arvhivito");
                         removeFromAssignmentTable(selectedFile);
                         PanelBlockUpdateSpecificFile(selectedFile, true);
@@ -1068,19 +1171,142 @@ public class SimulatorFrame extends javax.swing.JFrame {
                 this.FilesTree.repaint(); // Redibujar el árbol
                 // si es un directorio...
             }
-            
+
         } else {
             // Si el usuario cancela, simplemente salimos de la función
             return;
         }
-        
+
     }//GEN-LAST:event_DeleteButtonMouseClicked
 
-    public void deleteFile(){
-        
-    
+    private void SaveJSONButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SaveJSONButtonMouseClicked
+        // Lógica para guardar los archivos en un json
+        // Crear el objeto JSON raíz
+        JsonObject root = new JsonObject();
+
+        // Serializar el árbol de archivos (FilesTree)
+        DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) FilesTree.getModel().getRoot();
+        JsonObject treeJson = serializeTree(rootNode);
+        root.add("filesTree", treeJson);
+
+        // Serializar la lista de archivos
+        JsonArray filesArray = serializeFileList(app.getFileSystemApp().getAssignTableSystem().getListFiles());
+        root.add("fileList", filesArray);
+
+        // Guardar en archivo JSON
+        try (FileWriter writer = new FileWriter("file_system.json")) {
+            writer.write(root.toString());
+            JOptionPane.showMessageDialog(this, "Datos guardados exitosamente en file_system.json");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error al guardar los datos: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_SaveJSONButtonMouseClicked
+
+    // Método para serializar el árbol de archivos
+    private JsonObject serializeTree(DefaultMutableTreeNode node) {
+        JsonObject nodeJson = new JsonObject();
+        Object userObject = node.getUserObject();
+
+        if (userObject instanceof File) {
+            File file = (File) userObject;
+            nodeJson.addProperty("name", file.getFileName());
+            nodeJson.addProperty("type", "file");
+            nodeJson.addProperty("blockSize", file.getBlockSize());
+
+            // Serializar el primer bloque
+            if (file.getFirstBlock() != null) {
+                JsonObject firstBlockJson = new JsonObject();
+                firstBlockJson.addProperty("id", file.getFirstBlock().getId());
+                firstBlockJson.addProperty("state", file.getFirstBlock().isState());
+                nodeJson.add("firstBlock", firstBlockJson);
+            } else {
+                nodeJson.add("firstBlock", null);
+            }
+
+        } else if (userObject instanceof Directory) {
+            Directory directory = (Directory) userObject;
+            nodeJson.addProperty("name", directory.getDirectoryName());
+            nodeJson.addProperty("type", "directory");
+        } else {
+            nodeJson.addProperty("name", node.toString());
+            nodeJson.addProperty("type", "unknown");
+        }
+
+        JsonArray childrenArray = new JsonArray();
+        for (int i = 0; i < node.getChildCount(); i++) {
+            DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) node.getChildAt(i);
+            childrenArray.add(serializeTree(childNode));
+        }
+
+        nodeJson.add("children", childrenArray);
+        return nodeJson;
+    }
+
+    // Método para serializar la lista de archivos personalizada
+    private JsonArray serializeFileList(List<File> fileList) {
+        JsonArray filesArray = new JsonArray();
+
+        Node<File> currentFileNode = fileList.getpFirst();
+        while (currentFileNode != null) {
+            File file = currentFileNode.gettInfo();
+
+            JsonObject fileJson = new JsonObject();
+            fileJson.addProperty("fileName", file.getFileName());
+            fileJson.addProperty("blockSize", file.getBlockSize());
+
+            // Serializar el primer bloque
+            if (file.getFirstBlock() != null) {
+                JsonObject firstBlockJson = new JsonObject();
+                firstBlockJson.addProperty("id", file.getFirstBlock().getId());
+                firstBlockJson.addProperty("state", file.getFirstBlock().isState());
+                fileJson.add("firstBlock", firstBlockJson);
+            } else {
+                fileJson.add("firstBlock", null); // Importante: guardar null si no hay bloque inicial
+            }
+
+            // Serializar la lista de bloques asignados al archivo
+            JsonArray blocksArray = new JsonArray();
+            if (file.getBlocksList() != null) {
+                Node<Block> currentBlockNode = file.getBlocksList().getpFirst();
+                while (currentBlockNode != null) {
+                    Block block = currentBlockNode.gettInfo();
+                    JsonObject blockJson = new JsonObject();
+                    blockJson.addProperty("id", block.getId());
+                    blockJson.addProperty("state", block.isState());
+                    blocksArray.add(blockJson);
+
+                    currentBlockNode = currentBlockNode.getpNext();
+                }
+            }
+            fileJson.add("blocksList", blocksArray);
+
+            filesArray.add(fileJson);
+            currentFileNode = currentFileNode.getpNext();
+        }
+
+        return filesArray;
     }
     
+    private TreeNodeData convertToTreeNodeData(DefaultMutableTreeNode node) {
+        TreeNodeData treeNodeData = new TreeNodeData(node.toString());
+        List<TreeNodeData> children = new List<>("Children");
+
+        for (int i = 0; i < node.getChildCount(); i++) {
+            DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) node.getChildAt(i);
+            children.append(convertToTreeNodeData(childNode));
+        }
+
+        treeNodeData.setChildren(children);
+        return treeNodeData;
+    }
+    
+    
+
+    public void deleteFile() {
+
+    }
+
     private void removeFromAssignmentTable(File selectedFile) {
         // Obtener la lista de archivos asignados
         List<File> assignedFiles = app.getFileSystemApp().getAssignTableSystem().getListFiles();
@@ -1097,7 +1323,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
         // Actualizar la tabla de asignaciones
         updateAssignmentTable();
     }
-    
+
     /**
      * @param args the command line arguments
      */
@@ -1132,6 +1358,36 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
     }
+    public boolean canAddChild(DefaultMutableTreeNode parent, boolean isDirectory) {
+        Object userObject = parent.getUserObject();
+
+        if (userObject instanceof File && !isDirectory) {
+            JOptionPane.showMessageDialog(null, "No se puede crear un archivo dentro de otro archivo.");
+            return false;
+        }
+
+        return true;
+    }
+    
+    public void updateAssignTable(List<File> fileList) {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0); // Limpiar la tabla
+
+        Node<File> currentFileNode = fileList.getpFirst();
+        while (currentFileNode != null) {
+            File file = currentFileNode.gettInfo();
+            boolean accessToSD = app.getFileSystemApp().searchAndSet(file.getBlockSize(), file);
+            System.out.println("AHORA EL ARCHIVO TIENE " + file.getBlocksList().travel());
+            app.getFileSystemApp().getAssignTableSystem().getListFiles().append(file);
+            PanelBlocksUpdate(file.getFileName());
+            String blocksAssigned = (file.getBlocksList() != null) ? file.getBlocksList().travel2() : "N/A";
+            String firstBlockId = (file.getFirstBlock() != null) ? String.valueOf(file.getFirstBlock().getId()) : "N/A";
+
+            model.addRow(new Object[]{file.getFileName(), firstBlockId, file.getBlockSize(), blocksAssigned});
+
+            currentFileNode = currentFileNode.getpNext();
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> ComboBoxCreateSelection;
@@ -1155,11 +1411,13 @@ public class SimulatorFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSlider jSlider1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextArea logTextArea;
     // End of variables declaration//GEN-END:variables
 
     class BGPane extends JPanel {

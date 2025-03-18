@@ -7,6 +7,8 @@ package MainPackage;
 import AuxClass.List;
 import AuxClass.Node;
 import MainClasses.App;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Enumeration;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -17,7 +19,6 @@ import javax.swing.tree.TreeNode;
  */
 public class FileSystem {
 
-
     private AssignTable AssignTableSystem;
     private SD SDSystem;
 
@@ -27,10 +28,10 @@ public class FileSystem {
     }
 
     public boolean searchAndSet(int BlockSizeFile, File newFile) {
-        
+
         List<Block> BlocksListFile = new List("Blocks File");
         newFile.setBlocksList(BlocksListFile);
-        
+
         Node<Block> CurrentBlock = this.SDSystem.getBlocksList().first();
         int BlocksAvailable = 0;
         int Limit = this.SDSystem.getLimitBlocks();
@@ -48,23 +49,43 @@ public class FileSystem {
         }
 
         CurrentBlock = this.SDSystem.getBlocksList().first();
-        
+
         for (int i = 0; i < Limit && CurrentBlock != null && BlockSizeFile > 0; i++) {
             if (!CurrentBlock.gettInfo().isState()) {
-                
+
                 newFile.getBlocksList().append(CurrentBlock.gettInfo());
                 CurrentBlock.gettInfo().setFileInBlock(newFile);
                 CurrentBlock.gettInfo().setState(true);
-                BlockSizeFile--;  
+                BlockSizeFile--;
             }
             CurrentBlock = CurrentBlock.getpNext();
         }
         newFile.setFirstBlock((Block) BlocksListFile.first().gettInfo());
-        
+
         return true;
     }
-    
-    public void DeleteFile(){
+
+    public String ShowDate(DefaultMutableTreeNode NodeCreated, String Element, String Action) {
+
+        LocalDateTime dateTime = LocalDateTime.now();
+        DateTimeFormatter Formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        String NewDate = (dateTime.format(Formatter));
+
+        if (NodeCreated.getUserObject() instanceof File) {
+            System.out.println(NodeCreated);
+            File CurrentFile = (File) NodeCreated.getUserObject();            
+            
+            String result  = String.format(NewDate +" Se ha %s un %s, nombre: %s [A]\n", Action, Element, CurrentFile.getFileName()) ;
+            
+            return result;
+        }
+        else{
+            String result  = String.format(NewDate +" Se ha %s un %s, nombre: %s \n", Action, Element, NodeCreated.toString()) ;   
+            return result;
+        }
+    }
+
+    public void DeleteFile() {
         //
     }
 
@@ -75,15 +96,14 @@ public class FileSystem {
     public void setAssignTableSystem(AssignTable AssignTableSystem) {
         this.AssignTableSystem = AssignTableSystem;
     }
-    
-    
-      // Método para obtener todos los archivos a partir de un nodo dado
+
+    // Método para obtener todos los archivos a partir de un nodo dado
     public static List<DefaultMutableTreeNode> getAllFilesFromNode(DefaultMutableTreeNode node) {
         List<DefaultMutableTreeNode> fileList = new List<>("Lista de Archivos");
 
         // Llamar al método recursivo para llenar la lista
         collectFiles(node, fileList);
-        
+
         return fileList;
     }
 
@@ -91,7 +111,7 @@ public class FileSystem {
     private static void collectFiles(DefaultMutableTreeNode node, List<DefaultMutableTreeNode> fileList) {
         // Verificar si el nodo tiene hijos
         Enumeration<TreeNode> children = node.children();
-        
+
         while (children.hasMoreElements()) {
             TreeNode childNode = children.nextElement();
 
@@ -113,6 +133,5 @@ public class FileSystem {
             }
         }
     }
-
 
 }
