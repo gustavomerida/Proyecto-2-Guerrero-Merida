@@ -75,12 +75,12 @@ public class FileSystem {
             System.out.println(NodeCreated);
             File CurrentFile = (File) NodeCreated.getUserObject();            
             
-            String result  = String.format(NewDate +" Se ha %s un %s, nombre: %s [A]\n", Action, Element, CurrentFile.getFileName()) ;
+            String result  = String.format(NewDate + " ADMIN"  + " Se ha %s un %s, nombre: %s [A]\n", Action, Element, CurrentFile.getFileName()) ;
             
             return result;
         }
         else{
-            String result  = String.format(NewDate +" Se ha %s un %s, nombre: %s \n", Action, Element, NodeCreated.toString()) ;   
+            String result  = String.format(NewDate + " ADMIN " + " Se ha %s un %s, nombre: %s \n", Action, Element, NodeCreated.toString()) ;   
             return result;
         }
     }

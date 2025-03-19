@@ -76,15 +76,13 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
         this.setBounds(0, 0, 986, 618);
         this.setResizable(false);
-        
+
         PanelBlocksInit();
         app.getJsonData().loadJSON(FilesTree, this);
         configurarTreeRenderer();
-        
 
     }
 
-    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -692,7 +690,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
         int LimitTable = app.getFileSystemApp().getAssignTableSystem().getListFiles().size();
         List<File> ListFiles = app.getFileSystemApp().getAssignTableSystem().getListFiles();
-        if (!ListFiles.isEmpty()){
+        if (!ListFiles.isEmpty()) {
             for (int i = 0; i < LimitTable; i++) {
 
                 String FileName = ListFiles.get(i).getFileName();
@@ -992,73 +990,114 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
         String newNameInput = jTextField1.getText().trim();
 
-
         // Validar si el nombre está vacío
         if (newNameInput.isEmpty()) {
             JOptionPane.showMessageDialog(null, "El nombre no puede estar vacío.");
             return;
         }
 
-        // Verificar si el nombre ya existe en la misma carpeta o nodo padre
-        if (VerifyFileAtModify(newNameInput)) {
-            JOptionPane.showMessageDialog(null, "Ya existe un archivo o directorio con ese nombre en la misma ubicación.");
-            return;
+        // Verificar si el nodo seleccionado es un directorio o archivo
+        boolean isDirectory = false;
+        if (this.SelectedNode.getUserObject() instanceof Directory) {
+            isDirectory = true;
+            // Verificar si ya existe un directorio con el mismo nombre en la misma ubicación
+            if (VerifyDirectory(newNameInput)) {
+                JOptionPane.showMessageDialog(null, "Ya existe un directorio con ese nombre en la misma ubicación.");
+                return;
+            }
+        } else {
+            // Verificar si ya existe un archivo con el mismo nombre en la misma ubicación
+            if (VerifyFileAtModify(newNameInput)) {
+                JOptionPane.showMessageDialog(null, "Ya existe un archivo con ese nombre en la misma ubicación.");
+                return;
+            }
         }
 
-        File SelectedNodeAuxJtree = (File) this.SelectedNode.getUserObject();
-
-
-        // LOGICA PARA ACTUALIZAR EN EL SD Y ASSIGN 
-        System.out.println("Nodo seleccionado LUEGO DE HACER EL CAMBIO EN JTREE: " + this.SelectedNode.getUserObject().getClass());
-
-        if (this.SelectedNode.getUserObject() instanceof File) {
-
+        // Actualización de nombre para archivos
+        if (!isDirectory && this.SelectedNode.getUserObject() instanceof File) {
             System.out.println("Obtenemos el archivo");
             File SelectedFile = (File) this.SelectedNode.getUserObject();
-            //buscar en la lista de files por id del primer bloque
+
+            // Buscar en la lista de archivos por ID del primer bloque
             List<File> ListFiles = app.getFileSystemApp().getAssignTableSystem().getListFiles();
             Node<File> listedNode = ListFiles.getpFirst();
-            while (listedNode!=null){
-                System.out.println("recorriendo");
-                System.out.println(listedNode.gettInfo().getFirstBlock().getId());
-                System.out.println(SelectedFile.getFirstBlock().getId());
+            while (listedNode != null) {
                 if (listedNode.gettInfo().getFirstBlock().getId() == SelectedFile.getFirstBlock().getId()) {
-                    System.out.println("SON IGUALES");
                     SelectedFile = listedNode.gettInfo();
+                    break;
                 }
                 listedNode = listedNode.getpNext();
             }
+
+            // Actualizar el nombre del archivo
             SelectedFile.setFileName(newNameInput);
             String Info = app.getFileSystemApp().ShowDate(this.SelectedNode, "Archivo", "modificado");
             UpdateLogArea(Info);
 
             this.SelectedNode.setUserObject(SelectedFile);
 
+            // Actualizar la interfaz gráfica
             this.FilesTree.revalidate();
             this.FilesTree.repaint();
-
             updateAssignmentTable();
             PanelBlockUpdateSpecificFile(SelectedFile, false);
 
-
             JOptionPane.showMessageDialog(null, "Nombre cambiado exitosamente");
-        }else{
+
+            // Actualización de nombre para directorios
+        } else if (isDirectory && this.SelectedNode.getUserObject() instanceof Directory) {
+            System.out.println("Obtenemos el directorio");
             Directory SelectedDir = (Directory) this.SelectedNode.getUserObject();
+
+            // Verificar si ya existe un directorio con el mismo nombre en el mismo nivel
+            if (VerifyDirectoryAtParent(newNameInput)) {
+                JOptionPane.showMessageDialog(null, "Ya existe un directorio con ese nombre en la misma ubicación.");
+                return;
+            }
+
+            // Actualizar el nombre del directorio
             SelectedDir.setDirectoryName(newNameInput);
             String Info = app.getFileSystemApp().ShowDate(this.SelectedNode, "Directorio", "modificado");
             UpdateLogArea(Info);
 
             this.SelectedNode.setUserObject(SelectedDir);
 
+            // Actualizar la interfaz gráfica
             this.FilesTree.revalidate();
             this.FilesTree.repaint();
 
+            JOptionPane.showMessageDialog(null, "Nombre de directorio cambiado exitosamente");
+
         }
-        
-        
-
-
     }//GEN-LAST:event_GuardarCambiosMouseClicked
+
+    private boolean VerifyDirectoryAtParent(String directoryName) {
+        if (this.SelectedNode != null) {
+            // Obtener el nodo padre más cercano
+            DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) this.SelectedNode.getParent();
+
+            // Si el nodo no tiene padre, significa que está en el nivel raíz
+            if (parentNode == null) {
+                return false;
+            }
+
+            // Recorrer todos los hijos del padre para verificar si el nombre ya existe
+            Enumeration<TreeNode> siblings = parentNode.children();
+            while (siblings.hasMoreElements()) {
+                DefaultMutableTreeNode sibling = (DefaultMutableTreeNode) siblings.nextElement();
+                String label = sibling.getUserObject().toString();
+
+                // Verificar si el hijo es un directorio
+                if (label.contains(" [D]")) {
+                    String nodeName = label.substring(0, label.indexOf(" [D]")).trim();
+                    if (nodeName.equalsIgnoreCase(directoryName)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     private boolean VerifyFileAtModify(String FileName) {
         if (this.SelectedNode != null) {
@@ -1136,7 +1175,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
                 List<File> ListFiles = app.getFileSystemApp().getAssignTableSystem().getListFiles();
                 Node<File> listedNode = ListFiles.getpFirst();
-                while (listedNode!=null){
+                while (listedNode != null) {
                     System.out.println("recorriendo");
                     System.out.println(listedNode.gettInfo().getFirstBlock().getId());
                     System.out.println(selectedFile.getFirstBlock().getId());
@@ -1177,10 +1216,10 @@ public class SimulatorFrame extends javax.swing.JFrame {
                     Node<DefaultMutableTreeNode> current = FilesNodes.getpFirst();
                     while (current != null) {
                         File selectedFile = (File) current.gettInfo().getUserObject();
-                        
+
                         List<File> ListFiles = app.getFileSystemApp().getAssignTableSystem().getListFiles();
                         Node<File> listedNode = ListFiles.getpFirst();
-                        while (listedNode!=null){
+                        while (listedNode != null) {
                             System.out.println("recorriendo");
                             System.out.println(listedNode.gettInfo().getFirstBlock().getId());
                             System.out.println(selectedFile.getFirstBlock().getId());
@@ -1190,7 +1229,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
                             }
                             listedNode = listedNode.getpNext();
                         }
-                        
+
                         System.out.println(selectedFile + "es el arvhivito");
                         removeFromAssignmentTable(selectedFile);
                         PanelBlockUpdateSpecificFile(selectedFile, true);
@@ -1319,7 +1358,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
         return filesArray;
     }
-    
+
     private TreeNodeData convertToTreeNodeData(DefaultMutableTreeNode node) {
         TreeNodeData treeNodeData = new TreeNodeData(node.toString());
         List<TreeNodeData> children = new List<>("Children");
@@ -1332,8 +1371,6 @@ public class SimulatorFrame extends javax.swing.JFrame {
         treeNodeData.setChildren(children);
         return treeNodeData;
     }
-    
-    
 
     public void deleteFile() {
 
@@ -1390,6 +1427,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
             }
         });
     }
+
     public boolean canAddChild(DefaultMutableTreeNode parent, boolean isDirectory) {
         Object userObject = parent.getUserObject();
 
@@ -1400,7 +1438,7 @@ public class SimulatorFrame extends javax.swing.JFrame {
 
         return true;
     }
-    
+
     public void updateAssignTable(List<File> fileList) {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.setRowCount(0); // Limpiar la tabla
